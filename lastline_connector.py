@@ -1,0 +1,433 @@
+# --
+# File: lastline_connector.py
+#
+# Copyright (c) Phantom Cyber Corporation, 2014-2016
+#
+# This unpublished material is proprietary to Phantom Cyber.
+# All rights reserved. The methods and
+# techniques described herein are considered trade secrets
+# and/or confidential. Reproduction or distribution, in whole
+# or in part, is forbidden except by express written permission
+# of Phantom Cyber.
+#
+# --
+
+# Phantom imports
+import phantom.app as phantom
+from phantom.app import BaseConnector
+from phantom.app import ActionResult
+from phantom.vault import Vault
+
+from llmodule.analysis_apiclient import AnalysisClient, AnalysisAPIError, ANALYSIS_API_NO_RESULT_FOUND
+from lastline_consts import *
+
+# Other imports used by this connector
+from datetime import datetime
+import time
+import hashlib
+
+RESULTS_URL_TEMPLATE = 'https://user.lastline.com/malscape/#/task/{}'
+
+
+class LastlineConnector(BaseConnector):
+
+    # The actions supported by this connector
+    ACTION_ID_QUERY_FILE = "detonate file"
+    ACTION_ID_QUERY_URL = "detonate url"
+    ACTION_ID_SANDBOX_RESULTS = "get report"
+
+    def __init__(self):
+
+        # Call the BaseConnectors init first
+        super(LastlineConnector, self).__init__()
+
+        self._client = None
+        self._account_name = None
+
+    def initialize(self):
+
+        config = self.get_config()
+        self._client = AnalysisClient(config['base_url'], config['license_key'], config['api_token'])
+        self._account_name = config.get('account_username')
+
+        return phantom.APP_SUCCESS
+
+    def _update_report(self, response, report):
+
+        score = None
+        try:
+            score = response['data']['tasks'][0]['score']
+        except:
+            pass
+
+        try:
+            score = response['data']['score']
+        except:
+            pass
+        if (score):
+            report['score'] = score
+
+        md5 = None
+        try:
+            md5 = response['data']['tasks'][0]['file_md5']
+        except:
+            pass
+
+        try:
+            md5 = response['data']['analysis_subject']['md5']
+        except:
+            pass
+
+        if (md5):
+            report['md5'] = md5
+
+        mime_type = None
+
+        try:
+            mime_type = response['data']['analysis_subject']['mime_type']
+        except:
+            pass
+
+        if (mime_type):
+            report['mime_type'] = mime_type
+
+        malicious_activity = None
+
+        try:
+            malicious_activity = response['data']['malicious_activity']
+        except:
+            pass
+
+        if (malicious_activity):
+            malicious_activity = [{'type': x.split(':')[0], 'description': x.split(':')[1]} for x in malicious_activity]
+            report['malicious_activity'] = malicious_activity
+
+        threat = None
+
+        try:
+            threat = response['data']['threat']
+        except:
+            pass
+
+        if (threat):
+            report['threat'] = threat
+
+        threat_class = None
+
+        try:
+            threat_class = response['data']['threat_class']
+        except:
+            pass
+
+        if (threat_class):
+            report['threat_class'] = threat_class
+
+    def _poll_task_status(self, task_id, action_result, task_start_time=None):
+
+        if (not task_start_time):
+            task_start_time = datetime(1970, 1, 1)
+
+        polling_attempt = 0
+
+        config = self.get_config()
+
+        timeout = int(config.get(LASTLINE_JSON_POLL_TIMEOUT_SECS, LASTLINE_MAX_TIMEOUT_DEF_SECS))
+
+        if (timeout < LASTLINE_SLEEP_SECS):
+            return (action_result.set_status(phantom.APP_ERROR,
+                "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
+
+        max_polling_attempts = (timeout / LASTLINE_SLEEP_SECS)
+
+        while (polling_attempt < max_polling_attempts):
+
+            polling_attempt += 1
+
+            self.save_progress("Polling attempt {0} of {1}".format(polling_attempt, max_polling_attempts))
+
+            report = None
+
+            try:
+                response = self._client.get_result(task_id)
+                report = response.get('data', {}).get(RESULT_REPORT_KEY)
+            except AnalysisAPIError as e:
+                self.debug_print("Got AnalysisAPIError exception:", str(e))
+                no_result_found = bool(e.error_code == ANALYSIS_API_NO_RESULT_FOUND)
+                if (not no_result_found):
+                    return (action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None)
+            except Exception as e:
+                self.debug_print("Got Exception: ", e)
+                return (action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None)
+
+            if (report):
+                self._update_report(response, report)
+                return (phantom.APP_SUCCESS, report)
+
+            time.sleep(LASTLINE_SLEEP_SECS)
+
+        self.save_progress("Reached max polling attempts.")
+
+        return (phantom.APP_SUCCESS, None)
+
+    def _get_target(self, report, task_id):
+
+        # target is different thing depending on the type of detonation; url or file
+        # unfortunately in case 'get result' we don't know what type of detonation it was
+
+        # if url is present return that
+        try:
+            return ("url", report[ANALYSIS_KEY]['subject']['url'])
+        except:
+            pass
+
+        target = "Unknown"
+
+        # it's a file detonation, so need to get in roundabout way
+        try:
+            entry = report[ANALYSIS_SUBJECT_KEY][0]
+            subj_id = entry.get('overview', {}).get('process', {}).get('analysis_subject_id')
+            this_id = entry.get('overview', {}).get('id')
+            if subj_id == this_id:
+                target = entry.get('process', {}).get('executable', {}).get('static_pe_information', {}).get('original_filename')
+                if not target:
+                    target = entry.get('overview', {}).get('process', {}).get('executable', {}).get('filename', '').split('\\')[-1]
+        except Exception as e:
+            self.debug_print("Handled Exception: ", e)
+
+        return ('file', 'Unknown')
+
+    def _update_report_summary(self, report, action_result, task_id):
+
+        action_result.add_data({RESULT_REPORT_KEY: report})
+
+        result_url = RESULTS_URL_TEMPLATE.format(task_id)
+
+        analysis_type, target = self._get_target(report, task_id)
+
+        action_result.update_summary({TASK_ID_KEY: task_id,
+            RESULTS_URL_KEY: result_url, SUMMARY_TYPE_KEY: analysis_type, TARGET_KEY: target})
+
+        if ('score' in report):
+            action_result.update_summary({'score': report['score']})
+
+        return (phantom.APP_SUCCESS)
+
+    def _poll_task_parse_report(self, task_id, action_result, report=None, task_start_time=None):
+
+        if (report is None):
+
+            # first poll for the task status
+            ret_val, report = self._poll_task_status(task_id, action_result, task_start_time)
+
+            if (phantom.is_fail(ret_val)):
+                return action_result.get_status()
+
+            if (not report):
+                return action_result.set_status(phantom.APP_ERROR, LASTLINE_POLL_TIMEOUT.format(task_id))
+
+        ret_val = self._update_report_summary(report, action_result, task_id)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_detonation_result(self, param):
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        task_id = param[TASK_ID_KEY]
+        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id)})
+
+        return self._poll_task_parse_report(task_id, action_result)
+
+    def _get_task_id(self, response, action_result):
+
+        task_id = None
+
+        # Now get the data key, should be always present in a success result
+        data = response.get('data')
+
+        if (not data):
+            return (action_result.set_status(phantom.APP_ERROR, "Data key not found in response. API failed"), None, None)
+
+        # Check for errors, if present then the call failed
+        errors = data.get('errors')
+
+        if (errors):
+            errors = '. '.join(errors)
+            return (action_result.set_status(phantom.APP_ERROR, "API failed. Error: {0}".format(errors)), None, None)
+
+        # now check for success status
+        if (response.get('success') != 1):
+            return (action_result.set_status(phantom.APP_ERROR, "API call failed"), None, None)
+
+        # Now try to get the task uuid as if it was a detonation call
+        task_id = data.get('task_uuid')
+        report = data.get('report')
+
+        if (report):
+            self._update_report(response, report)
+
+        if task_id:
+            return (phantom.APP_SUCCESS, task_id, report)
+
+        # it's not at the location of a detonation result, now check if it is present at
+        # the location of a query hash
+        if (data.get('files_found', 0) > 0):
+            try:
+                return ( phantom.APP_SUCCESS, data['tasks'][0]['task_uuid'], report)
+            except Exception as e:
+                self.debug_print("Handled Exception:", e)
+
+        return (phantom.APP_ERROR, None, None)
+
+    def _query_url(self, param):
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        task_start_time = datetime.utcnow()
+
+        try:
+            response = self._client.submit_url(param['url'], push_to_portal_account=self._account_name)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_SUBMIT_URL, e)
+
+        ret_val, task_id, report = self._get_task_id(response, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
+            TARGET_KEY: param['url'], SUMMARY_TYPE_KEY: ANALYSIS_TYPE_URL})
+
+        if (not report):
+            # Sleep for few seconds before querying the results. Gives the server some time and results in less failures.
+            time.sleep(2)
+
+        return self._poll_task_parse_report(task_id, action_result, report, task_start_time)
+
+    def _query_file(self, param):
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        vault_id = param['vault_id']
+        filename = param.get('file_name')
+        force_analysis = param.get('force_analysis')
+        task_id = None
+
+        task_start_time = datetime.utcnow()
+
+        # First try to query the file as is, without uploading, if lastline has results for it
+        try:
+            response = self._client.query_file_hash(sha1=vault_id)
+        except Exception as e:
+            self.debug_print("Exception on query_file {0}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error Querying file hash", e)
+
+        # get the task id
+        ret_val, task_id, report = self._get_task_id(response, action_result)
+
+        if (phantom.is_success(ret_val)):
+            # we got a task id, means hash already present, get the result
+            return self._poll_task_parse_report(task_id, action_result, report)
+
+        # New hash, will need to upload the bytes
+        try:
+            payload = open(Vault.get_file_path(vault_id), 'rb')
+        except:
+            return action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id))
+
+        # Submit it to the cloud
+        response = self._client.submit_file(payload,
+                bypass_cache=force_analysis,
+                delete_after_analysis=None,
+                filename=filename,
+                push_to_portal_account=self._account_name)
+
+        # Get the task id
+        ret_val, task_id, report = self._get_task_id(response, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_TASK_ID_NOT_FOUND)
+
+        summary = {TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
+                SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE, TARGET_KEY: vault_id}
+
+        action_result.update_summary(summary)
+
+        if (not report):
+            # Sleep for few seconds before querying the results. Gives the server some time and results in less failures.
+            time.sleep(2)
+
+        return self._poll_task_parse_report(task_id, action_result, report, task_start_time)
+
+    def _test_connectivity(self, param):
+
+        # Create a hash of a random string
+        random_string = phantom.get_random_chars(size=10)
+
+        config = self.get_config()
+
+        timeout = int(config.get(LASTLINE_JSON_POLL_TIMEOUT_SECS, LASTLINE_MAX_TIMEOUT_DEF_SECS))
+
+        if (timeout < LASTLINE_SLEEP_SECS):
+            self.save_progress(LASTLINE_ERR_CONNECTIVITY_TEST)
+            return (self.set_status(phantom.APP_ERROR,
+                "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
+        md5_hash = hashlib.md5(random_string).hexdigest()
+
+        self.save_progress(LASTLINE_GENERATED_RANDOM_HASH, gen_hash=md5_hash)
+
+        try:
+            self._client.query_file_hash(md5=md5_hash)
+        except Exception as e:
+            self.save_progress(str(e))
+            return self.set_status(phantom.APP_ERROR, LASTLINE_ERR_CONNECTIVITY_TEST)
+
+        return self.set_status_save_progress(phantom.APP_SUCCESS, LASTLINE_SUCC_CONNECTIVITY_TEST)
+
+    def handle_action(self, param):
+        """Function that handles all the actions
+
+        Args:
+
+        Return:
+            A status code
+        """
+
+        action = self.get_action_identifier()
+
+        if (action == self.ACTION_ID_QUERY_FILE):
+            result = self._query_file(param)
+        elif (action == self.ACTION_ID_QUERY_URL):
+            result = self._query_url(param)
+        elif (action == self.ACTION_ID_SANDBOX_RESULTS):
+            result = self._get_detonation_result(param)
+        elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+            result = self._test_connectivity(param)
+
+        return result
+
+if __name__ == '__main__':
+
+    import sys
+    import json
+
+    import pudb
+
+    pudb.set_trace()
+
+    with open(sys.argv[1]) as f:
+
+        in_json = f.read()
+
+        in_json = json.loads(in_json)
+
+        print(json.dumps(in_json, indent=4))
+
+        connector = LastlineConnector()
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print ret_val
+
+    exit(0)
