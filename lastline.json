@@ -1,7 +1,7 @@
 {
     "appid"    : "c49fa5f8-7c0f-4b63-85f8-9a79853791bd",
     "name"   : "Lastline",
-    "description": "This app supports executing investigative actions like 'detonate file' and 'detonate url' to analyze executables and URLs on the online Lastline sandbox.",
+    "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.pyc",
     "app_version": "1.2.34",
@@ -10,11 +10,11 @@
     "product_vendor": "Lastline",
     "product_name": "Lastline",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.2.236",
+    "min_phantom_version": "3.0.247",
     "publisher": "Phantom",
     "consolidate_widgets": true,
     "logo": "lastline.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2015-2016",
+    "license": "Copyright (c) Phantom Cyber Corporation 2015-2017",
     "configuration": {
       "base_url": {
         "data_type": "string",
