@@ -23,28 +23,35 @@
             "required": true,
             "default": "https://analysis.lastline.com"
         },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "order": 1,
+            "description": "Verify Server Certificate",
+            "required": false,
+            "default": true
+        },
         "timeout": {
             "data_type": "numeric",
-            "order": 1,
+            "order": 2,
             "description": "Timeout (seconds)",
             "required": true,
             "defualt": 120
         },
         "license_key": {
             "data_type": "string",
-            "order": 2,
+            "order": 3,
             "description": "License Key",
             "required": true
         },
         "api_token": {
-            "data_type": "string",
-            "order": 3,
+            "data_type": "password",
+            "order": 4,
             "description": "API Token",
             "required": true
         },
         "account_username": {
             "data_type": "string",
-            "order": 4,
+            "order": 5,
             "description": "Push Account",
             "required": false
         }
