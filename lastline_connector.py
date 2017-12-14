@@ -47,7 +47,10 @@ class LastlineConnector(BaseConnector):
     def initialize(self):
 
         config = self.get_config()
-        self._client = AnalysisClient(config['base_url'], config['license_key'], config['api_token'])
+        self._client = AnalysisClient(
+            config['base_url'], config['license_key'],
+            config['api_token'], verify_ssl=config.get('verify_server_cert', True)
+        )
         self._account_name = config.get('account_username')
 
         return phantom.APP_SUCCESS
@@ -408,6 +411,7 @@ class LastlineConnector(BaseConnector):
             result = self._test_connectivity(param)
 
         return result
+
 
 if __name__ == '__main__':
 
