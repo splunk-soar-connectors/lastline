@@ -13,8 +13,9 @@
     "min_phantom_version": "3.0.247",
     "publisher": "Phantom",
     "consolidate_widgets": true,
-    "logo": "lastline.png",
-    "license": "Copyright (c) Phantom Cyber Corporation 2015-2017",
+    "logo": "logo_lastline.svg",
+    "logo_dark": "logo_lastline_dark.svg",
+    "license": "Copyright (c) Phantom Cyber Corporation 2015-2016",
     "configuration": {
         "base_url": {
             "data_type": "string",

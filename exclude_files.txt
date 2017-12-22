@@ -1,3 +1,4 @@
 lastline_connector.py
 lastline_consts.py
 lastline_view.py
+.git*
