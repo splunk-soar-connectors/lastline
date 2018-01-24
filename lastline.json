@@ -15,7 +15,7 @@
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) Phantom Cyber Corporation 2015-2016",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2015-2018",
     "configuration": {
         "base_url": {
             "data_type": "string",
