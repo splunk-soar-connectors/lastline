@@ -1,4 +1,7 @@
-lastline_connector.py
-lastline_consts.py
+docker-compose.yml
+Makefile
 lastline_view.py
+lastline_connector.py
 .git*
+lastline_consts.py
+.gitlab-ci.yml
