@@ -5,3 +5,4 @@ lastline_connector.py
 .git*
 lastline_consts.py
 .gitlab-ci.yml
+whitesource-results
