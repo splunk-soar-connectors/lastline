@@ -1,22 +1,15 @@
 # --
 # File: lastline_connector.py
+# Copyright (c) 2015-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom imports
 import phantom.app as phantom
 from phantom.app import BaseConnector
 from phantom.app import ActionResult
-from phantom.vault import Vault
+import phantom.rules as phrules
 
 from llmodule.analysis_apiclient import AnalysisClient, AnalysisAPIError, ANALYSIS_API_NO_RESULT_FOUND
 from lastline_consts import *
@@ -67,7 +60,7 @@ class LastlineConnector(BaseConnector):
             score = response['data']['score']
         except:
             pass
-        if (score):
+        if score:
             report['score'] = score
 
         md5 = None
@@ -81,7 +74,7 @@ class LastlineConnector(BaseConnector):
         except:
             pass
 
-        if (md5):
+        if md5:
             report['md5'] = md5
 
         mime_type = None
@@ -91,7 +84,7 @@ class LastlineConnector(BaseConnector):
         except:
             pass
 
-        if (mime_type):
+        if mime_type:
             report['mime_type'] = mime_type
 
         malicious_activity = None
@@ -101,7 +94,7 @@ class LastlineConnector(BaseConnector):
         except:
             pass
 
-        if (malicious_activity):
+        if malicious_activity:
             malicious_activity = [{'type': x.split(':')[0], 'description': x.split(':')[1]} for x in malicious_activity]
             report['malicious_activity'] = malicious_activity
 
@@ -112,7 +105,7 @@ class LastlineConnector(BaseConnector):
         except:
             pass
 
-        if (threat):
+        if threat:
             report['threat'] = threat
 
         threat_class = None
@@ -122,12 +115,12 @@ class LastlineConnector(BaseConnector):
         except:
             pass
 
-        if (threat_class):
+        if threat_class:
             report['threat_class'] = threat_class
 
     def _poll_task_status(self, task_id, action_result, task_start_time=None):
 
-        if (not task_start_time):
+        if not task_start_time:
             task_start_time = datetime(1970, 1, 1)
 
         polling_attempt = 0
@@ -136,13 +129,13 @@ class LastlineConnector(BaseConnector):
 
         timeout = int(config.get(LASTLINE_JSON_POLL_TIMEOUT_SECS, LASTLINE_MAX_TIMEOUT_DEF_SECS))
 
-        if (timeout < LASTLINE_SLEEP_SECS):
+        if timeout < LASTLINE_SLEEP_SECS:
             return (action_result.set_status(phantom.APP_ERROR,
-                "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
+                                             "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
 
         max_polling_attempts = (timeout / LASTLINE_SLEEP_SECS)
 
-        while (polling_attempt < max_polling_attempts):
+        while polling_attempt < max_polling_attempts:
 
             polling_attempt += 1
 
@@ -156,34 +149,32 @@ class LastlineConnector(BaseConnector):
             except AnalysisAPIError as e:
                 self.debug_print("Got AnalysisAPIError exception:", str(e))
                 no_result_found = bool(e.error_code == ANALYSIS_API_NO_RESULT_FOUND)
-                if (not no_result_found):
-                    return (action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None)
+                if not no_result_found:
+                    return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None
             except Exception as e:
                 self.debug_print("Got Exception: ", e)
-                return (action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None)
+                return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None
 
-            if (report):
+            if report:
                 self._update_report(response, report)
-                return (phantom.APP_SUCCESS, report)
+                return phantom.APP_SUCCESS, report
 
             time.sleep(LASTLINE_SLEEP_SECS)
 
         self.save_progress("Reached max polling attempts.")
 
-        return (phantom.APP_SUCCESS, None)
+        return phantom.APP_SUCCESS, None
 
-    def _get_target(self, report, task_id):
+    def _get_target(self, report):
 
         # target is different thing depending on the type of detonation; url or file
         # unfortunately in case 'get result' we don't know what type of detonation it was
 
         # if url is present return that
         try:
-            return ("url", report[ANALYSIS_KEY]['subject']['url'])
+            return "url", report[ANALYSIS_KEY]['subject']['url']
         except:
             pass
-
-        target = "Unknown"
 
         # it's a file detonation, so need to get in roundabout way
         try:
@@ -197,7 +188,7 @@ class LastlineConnector(BaseConnector):
         except Exception as e:
             self.debug_print("Handled Exception: ", e)
 
-        return ('file', 'Unknown')
+        return 'file', 'Unknown'
 
     def _update_report_summary(self, report, action_result, task_id):
 
@@ -205,32 +196,32 @@ class LastlineConnector(BaseConnector):
 
         result_url = RESULTS_URL_TEMPLATE.format(task_id)
 
-        analysis_type, target = self._get_target(report, task_id)
+        analysis_type, target = self._get_target(report)
 
         action_result.update_summary({TASK_ID_KEY: task_id,
             RESULTS_URL_KEY: result_url, SUMMARY_TYPE_KEY: analysis_type, TARGET_KEY: target})
 
-        if ('score' in report):
+        if 'score' in report:
             action_result.update_summary({'score': report['score']})
 
-        return (phantom.APP_SUCCESS)
+        return phantom.APP_SUCCESS
 
     def _poll_task_parse_report(self, task_id, action_result, report=None, task_start_time=None):
 
-        if (report is None):
+        if report is None:
 
             # first poll for the task status
             ret_val, report = self._poll_task_status(task_id, action_result, task_start_time)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            if (not report):
+            if not report:
                 return action_result.set_status(phantom.APP_ERROR, LASTLINE_POLL_TIMEOUT.format(task_id))
 
         ret_val = self._update_report_summary(report, action_result, task_id)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -251,19 +242,19 @@ class LastlineConnector(BaseConnector):
         # Now get the data key, should be always present in a success result
         data = response.get('data')
 
-        if (not data):
-            return (action_result.set_status(phantom.APP_ERROR, "Data key not found in response. API failed"), None, None)
+        if not data:
+            return action_result.set_status(phantom.APP_ERROR, "Data key not found in response. API failed"), None, None
 
         # Check for errors, if present then the call failed
         errors = data.get('errors')
 
-        if (errors):
+        if errors:
             errors = '. '.join(errors)
             return (action_result.set_status(phantom.APP_ERROR, "API failed. Error: {0}".format(errors)), None, None)
 
         # now check for success status
-        if (response.get('success') != 1):
-            return (action_result.set_status(phantom.APP_ERROR, "API call failed"), None, None)
+        if response.get('success') != 1:
+            return action_result.set_status(phantom.APP_ERROR, "API call failed"), None, None
 
         # Now try to get the task uuid as if it was a detonation call
         task_id = data.get('task_uuid')
@@ -273,17 +264,17 @@ class LastlineConnector(BaseConnector):
             self._update_report(response, report)
 
         if task_id:
-            return (phantom.APP_SUCCESS, task_id, report)
+            return phantom.APP_SUCCESS, task_id, report
 
         # it's not at the location of a detonation result, now check if it is present at
         # the location of a query hash
-        if (data.get('files_found', 0) > 0):
+        if data.get('files_found', 0) > 0:
             try:
-                return ( phantom.APP_SUCCESS, data['tasks'][0]['task_uuid'], report)
+                return phantom.APP_SUCCESS, data['tasks'][0]['task_uuid'], report
             except Exception as e:
                 self.debug_print("Handled Exception:", e)
 
-        return (phantom.APP_ERROR, None, None)
+        return phantom.APP_ERROR, None, None
 
     def _query_url(self, param):
 
@@ -298,17 +289,29 @@ class LastlineConnector(BaseConnector):
 
         ret_val, task_id, report = self._get_task_id(response, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
-            TARGET_KEY: param['url'], SUMMARY_TYPE_KEY: ANALYSIS_TYPE_URL})
+                                      TARGET_KEY: param['url'], SUMMARY_TYPE_KEY: ANALYSIS_TYPE_URL})
 
-        if (not report):
+        if not report:
             # Sleep for few seconds before querying the results. Gives the server some time and results in less failures.
             time.sleep(2)
 
         return self._poll_task_parse_report(task_id, action_result, report, task_start_time)
+
+    def _get_vault_file_info(self, action_result, vault_id):
+
+        try:
+            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            vault_info = list(vault_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None, None
+
+        return phantom.APP_SUCCESS, vault_info
 
     def _query_file(self, param):
 
@@ -331,35 +334,42 @@ class LastlineConnector(BaseConnector):
         # get the task id
         ret_val, task_id, report = self._get_task_id(response, action_result)
 
-        if (phantom.is_success(ret_val)):
+        if phantom.is_success(ret_val):
             # we got a task id, means hash already present, get the result
             return self._poll_task_parse_report(task_id, action_result, report)
 
         # New hash, will need to upload the bytes
+        ret_val, file_info = self._get_vault_file_info(action_result, vault_id)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
         try:
-            payload = open(Vault.get_file_path(vault_id), 'rb')
+            payload = open(file_info['path'], 'rb')
         except:
             return action_result.set_status(phantom.APP_ERROR, 'File not found in vault ("{}")'.format(vault_id))
 
         # Submit it to the cloud
-        response = self._client.submit_file(payload,
-                bypass_cache=force_analysis,
-                delete_after_analysis=None,
-                filename=filename,
-                push_to_portal_account=self._account_name)
+        try:
+            response = self._client.submit_file(payload,
+                                                bypass_cache=force_analysis,
+                                                delete_after_analysis=None,
+                                                filename=filename,
+                                                push_to_portal_account=self._account_name)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, str(e))
 
         # Get the task id
         ret_val, task_id, report = self._get_task_id(response, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_TASK_ID_NOT_FOUND)
 
         summary = {TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
-                SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE, TARGET_KEY: vault_id}
+                   SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE, TARGET_KEY: vault_id}
 
         action_result.update_summary(summary)
 
-        if (not report):
+        if not report:
             # Sleep for few seconds before querying the results. Gives the server some time and results in less failures.
             time.sleep(2)
 
@@ -374,11 +384,11 @@ class LastlineConnector(BaseConnector):
 
         timeout = int(config.get(LASTLINE_JSON_POLL_TIMEOUT_SECS, LASTLINE_MAX_TIMEOUT_DEF_SECS))
 
-        if (timeout < LASTLINE_SLEEP_SECS):
+        if timeout < LASTLINE_SLEEP_SECS:
             self.save_progress(LASTLINE_ERR_CONNECTIVITY_TEST)
             return (self.set_status(phantom.APP_ERROR,
-                "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
-        md5_hash = hashlib.md5(random_string).hexdigest()
+                                    "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
+        md5_hash = hashlib.md5(random_string.encode()).hexdigest()
 
         self.save_progress(LASTLINE_GENERATED_RANDOM_HASH, gen_hash=md5_hash)
 
@@ -401,13 +411,13 @@ class LastlineConnector(BaseConnector):
 
         action = self.get_action_identifier()
 
-        if (action == self.ACTION_ID_QUERY_FILE):
+        if action == self.ACTION_ID_QUERY_FILE:
             result = self._query_file(param)
-        elif (action == self.ACTION_ID_QUERY_URL):
+        elif action == self.ACTION_ID_QUERY_URL:
             result = self._query_url(param)
-        elif (action == self.ACTION_ID_SANDBOX_RESULTS):
+        elif action == self.ACTION_ID_SANDBOX_RESULTS:
             result = self._get_detonation_result(param)
-        elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self._test_connectivity(param)
 
         return result
@@ -432,6 +442,6 @@ if __name__ == '__main__':
 
         connector = LastlineConnector()
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print ret_val
+        print(ret_val)
 
     exit(0)

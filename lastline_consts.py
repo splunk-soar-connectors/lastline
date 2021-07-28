@@ -1,15 +1,9 @@
 # --
 # File: lastline_consts.py
+# Copyright (c) 2015-2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2014-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 # --
 RESULT_REPORT_KEY = "report"
 TASK_ID_KEY = 'id'
@@ -23,12 +17,18 @@ URL_ANALYSIS_ENDED_KEY = 'analysis_ended'
 FILE_ANALYSIS_END_KEY = 'analysis_end'
 ANALYSIS_SUBJECT_KEY = 'analysis_subjects'
 
+VAULT_ERR_INVALID_VAULT_ID = "Invalid Vault ID"
+VAULT_ERR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
+
+PHANTOM_ERR_CODE_UNAVAILABLE = "Error code unavailable"
+PHANTOM_ERR_MSG_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
-LASTLINE_SUCC_CONNECTIVITY_TEST = "Connectivity test succeeded"
-LASTLINE_ERR_CONNECTIVITY_TEST = "Connectivity test failed"
-LASTLINE_ERR_CONNECT = "Error occured, response: {response}"
+LASTLINE_SUCC_CONNECTIVITY_TEST = "Test Connectivity Passed"
+LASTLINE_ERR_CONNECTIVITY_TEST = "Test Connectivity Failed"
+LASTLINE_ERR_CONNECT = "Error occurred, response: {response}"
 LASTLINE_ERR_GETTING_REPORT = "Error getting report"
-LASTLINE_ERR_SUBMIT_URL = "Error submutting URL"
+LASTLINE_ERR_SUBMIT_URL = "Error submitting URL"
 LASTLINE_ERR_TASK_ID_NOT_FOUND = "Task ID not found"
 LASTLINE_ERR_NO_FILES = "No runnable files found."
 

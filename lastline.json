@@ -3,19 +3,23 @@
     "name": "Lastline",
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
-    "main_module": "lastline_connector.pyc",
-    "app_version": "1.2.43",
+    "main_module": "lastline_connector.py",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T02:10:50.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
     "product_name": "Lastline",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.247",
-    "publisher": "Phantom",
+    "min_phantom_version": "4.9.39220",
+    "publisher": "Splunk",
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2015-2018",
+    "license": "Copyright (c) 2015-2021 Splunk Inc.",
+    "python_version": "3",
+    "latest_tested_versions": [
+        ""
+    ],
     "configuration": {
         "base_url": {
             "data_type": "string",
@@ -28,7 +32,6 @@
             "data_type": "boolean",
             "order": 1,
             "description": "Verify Server Certificate",
-            "required": false,
             "default": true
         },
         "timeout": {
@@ -53,8 +56,7 @@
         "account_username": {
             "data_type": "string",
             "order": 5,
-            "description": "Push Account",
-            "required": false
+            "description": "Push Account"
         }
     },
     "actions": [
@@ -82,63 +84,217 @@
                 },
                 "file_name": {
                     "description": "Filename to use",
-                    "verbose": "This value will be passed to the sandbox as the name of the file that is pickup up from the vault.",
                     "data_type": "string",
                     "order": 1,
                     "contains": [
                         "file name"
                     ],
-                    "required": false
+                    "primary": true
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.report.uuid",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id",
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
+                    "data_type": "numeric",
+                    "example_value": [
+                        904198
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "9657a182c22d26c78872d009298ba7e6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_sha1",
+                    "data_type": "string",
+                    "example_value": [
+                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "application/pdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
+                    "data_type": "numeric",
+                    "example_value": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.error",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.format.name",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.filename",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.format.build_version",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type_str",
+                    "data_type": "numeric",
+                    "example_value": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
+                    "data_type": "numeric",
+                    "example_value": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.task_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
+                    "data_type": "string",
+                    "example_value": [
+                        "file://9227f7e2989ef79522e36e103b2270adc81abd80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
+                    "data_type": "string",
+                    "example_value": [
+                        "2021-07-23 14:33:42+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.detector",
+                    "data_type": "string",
+                    "example_value": [
+                        "3.1.2490"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.subject.md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "9657a182c22d26c78872d009298ba7e6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.subject.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.subject.type",
+                    "data_type": "string",
+                    "example_value": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "9657a182c22d26c78872d009298ba7e6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_sha1",
+                    "data_type": "string",
+                    "example_value": [
+                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.text_from_documents.*.text",
+                    "data_type": "string",
+                    "example_value": [
+                        "Anomali ThreatStream API\n\nReference Guide\n\nVersion: v2.5.5\n\nDecember 21, 2020\n\n\fCopyright Notice\n\n 2020 Anomali, Inc. All rights reserved.\nThreatStream is a registered servicemark. Optic, Anomali Harmony, and Anomali Reports are registered trademarks.\nAll other brands, products, and company names used herein may be trademarks of their respective owners.\n\nSupport\n\nSupport Portal\n\nEmail\n\nPhone\n\nTwitter\n\nhttps://support.threatstream.com\n\nsupport@threatstream.com\n\n+1 844-4-THREATS\n\n@threatstream\n\nDocumentation Updates\n\nDate\n\n12/21/2020\n\n11/23/2020\n\n10/14/2020\n\n9/1/2020\n\n7/20/2020\n\n7/2/2020\n\n6/23/2020\n\n6/11/2020\n\nProduct Version\n\nDescription\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nUpdated \"Passive DNS\" on page39.\n\nUpdated \"Introduction\" on page5 and\n\"Threat Model \" on page65. Added\n\"SSO History\" on page62.\n\nUpdated \"Threat Model \" on page65.\n\nUpdated \"User Audit\" on page120.\n\nUpdated \"Import (without approval)\" on\npage17.\n\nUpdated \"Authenticating to\nThreatStream\" on page5.\n\nUpdated \"Appstorehistory\" on page125\nand \"Feed\" on page132.\n\nAdded \"Appstorehistory\" on page125.\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 2 of 158\n\n\fCONTENTS\n\nIntroduction\n\nAccessing the API\nPrerequisites\nUsing API to Access ThreatStream OnPrem\n\nImport\n\nImport (with approval)\nImport (without approval)\n\nIntelligence\n\nManaging Threat Model Entity and Observable Tags\n\nConfidence\n\nManaging Observable Tags in Bulk\n\nIntelligence Enrichments\n\nRules\n\nExamples\n\nSandbox\n\nSnapshot\n\nSSO History\n\nThreat Model\n\nThreat Model Search\nActors\nCampaigns\nIncidents\nSignatures\nTipreport\n\n5\n5\n8\n8\n\n10\n10\n17\n\n24\n\n33\n\n35\n\n37\n\n39\n\n43\n49\n\n50\n\n54\n\n62\n\n65\n65\n70\n76\n82\n87\n91\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 3 of 158\n\n\fReference Guide\n\nTTPs (Tactics, Techniques, and Procedures)\nVulnerabilities\nManaging Threat Model Associations\n\nInvestigation\n\nUser Administration\n\nRequest\n\nAttributes\n\nUser Audit\n\nAttributes\n\nAppstorehistory\n\nWhitelist\n\nFeed\n\nAttributes\nExamples\n\nAppendix 1: Intelligence Fields in ThreatStream\n\nAppendix 2: Indicator Types in ThreatStream\n\nAppendix 3: Fraud Indicator Types for ThreatStream OnPrem\n\nAppendix 4: Threat Types in ThreatStream\n\nSend Documentation Feedback\n\n97\n102\n106\n\n109\n\n116\n116\n116\n\n120\n120\n\n125\n\n128\n\n132\n132\n132\n\n134\n\n138\n\n153\n\n155\n\n158\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 4 of 158\n\n\fIntroduction\n\nAnomali ThreatStream (previously known as ThreatStream Optic) is accessible through RESTAPIs,\nwhich are available to all Premium customers. The APIs offers bi-directional interaction with the\nThreatStream platform.\nThe APIs allow you to pull threat intelligence from the ThreatStream platform for use with other third-\nparty tools, import observables into ThreatStream from any source, manage threat model entities and\ninvestigations, and so on.\n\nAccessing the API\n\nTo access the API, use the following base URL:\n\nhttps://api.threatstream.com/api/<api_version>/<resource>/\nwhere\napi_version is either v1 or v2. Refer to each API call to determine the version to use.\nresource is APIendpoint; for example, import, intelligence, tipreport\n\nAuthenticating to ThreatStream\nMaking requests through the APIrequires authenticating to ThreatStream using your usernamethe\nemail address associated with your ThreatStream accountand your dedicated APIKey. You can\nreference your username and APIKey on the My Profile tab within ThreatStream settings.\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 5 of 158\n\n\fReference Guide\nIntroduction\n\nSpecifying your username and API Key in the header of the request is the most secure method of\nauthentication. Anomali recommends using this authentication method, as shown in the following\nexample:\n\ncurl 'https://api.threatstream.com/api/v2/intelligence/?itype=bot_ip' -H\n'Authorization: apikey <username>:<api_key>'\n\nNote: Specifying usernames and API Keys in the URL of the request will be deprecated as an\navailable authentication method for ThreatStream in a future release.\n\nUsing Operators\nThe first API operator called after the resource must start with a question mark and subsequent\noperators must begin with an ampersand.\nExample:\n\ncurl 'https://api.threatstream.com/api/v1/intelligence/?itype=bot_ip&status=active'\n-H 'Authorization: apikey <username>:<api_key>'\n\nAPIMetadata\nThe following is an example of typical ThreatStream API metadata:\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 6 of 158\n\n\fReference Guide\nIntroduction\n\nl total_countthe total number of results that can be retrieved by the API call.\n\nl approximate_countset to true in cases where API calls yield exceptionally large datasets to\n\nindicate that the total count may not include all results.\n\nNote: The approximate_count metadata attribute is only included in API query responses\nunder certain conditions. Typically, these are scenarios where results are exceptionally large\nand approximation improves application performance.\n\nl tooktime in milliseconds ThreatStream took to retrieve the data.\n\nl nextcall that can be used to iteratively retrieve the next set of data in the total results.\n\nl limitnumber of results returned when API call is made. See \"Limiting Results\" below.\n\nl o\n..."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.child_url_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "url-in-pdf-text"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.source_url",
+                    "data_type": "string",
+                    "example_value": [
+                        "file://testf7e2989ef79522e36e103b2270adc81atest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.task_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.url",
+                    "data_type": "string",
+                    "example_value": [
+                        "http://ui.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_engine_version",
+                    "data_type": "numeric",
+                    "example_value": [
+                        50399674
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.analysis_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.analysis_subject_id",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.major_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.minor_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.remarks.info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.overview.analysis_end",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.overview.analysis_start",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.overview.analysis_engine",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.overview.analysis_engine_version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.overview.analysis_termination_reason",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.name",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.delete_date",
@@ -149,19 +305,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.metadata_type",
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.create_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.analysis_subject_id",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.file_info",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.timestamp",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.analysis_reason",
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.llfile",
                     "data_type": "string"
                 },
                 {
@@ -185,14 +337,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.sha256",
                     "data_type": "string",
                     "contains": [
@@ -201,15 +345,23 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.file_info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.create_timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.ext_info.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.file.abs_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.llfile",
                     "data_type": "string"
                 },
                 {
@@ -233,14 +385,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.sha256",
                     "data_type": "string",
                     "contains": [
@@ -249,12 +393,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.file_info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.create_timestamp",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.file.ext_info.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.file.filename",
@@ -264,417 +404,41 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.bitsize",
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.metadata_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.retention_date",
+                    "data_type": "string",
+                    "example_value": [
+                        "2021-10-21 14:33:44"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.timestamp",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.arguments",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.dns_server",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.abs_path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.filename",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.hostname",
                     "data_type": "string",
                     "contains": [
-                        "pe file"
+                        "host name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.iostatus",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.response_flags",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.file_attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.author",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.imphash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.compile_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.original_filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.process_id",
-                    "data_type": "string",
-                    "contains": [
-                        "pid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.analysis_subject_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.bitsize",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.arguments",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.abs_path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.iostatus",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.file_attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.author",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.imphash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.compile_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.original_filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.process_id",
-                    "data_type": "string",
-                    "contains": [
-                        "pid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.analysis_subject_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.mime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.sha1",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha256"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.file_info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.create_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.kernel_mode",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.analysis_reason",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.bitsize",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_uuid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.virtual_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.snapshot_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.thread_eips.*.eip",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.thread_eips.*.tid",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.access",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.trusted",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_uuid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.virtual_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.analysis_reason",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.object_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.virtual_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.object_description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.snapshot_timestamp",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.abs_path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.iostatus",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.file_attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.author",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.imphash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.compile_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.original_filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.abs_path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.accesses.*.options",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.accesses.*.disposition",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.mime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.sha1",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha256"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.file_info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.create_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.iostatus",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.file_attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.author",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.imphash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.compile_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.original_filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.mutex_opens.*.mutex_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_queries.*.status",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.results",
                     "data_type": "string"
                 },
                 {
@@ -685,243 +449,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_searches",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_queries.*.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.strings_lists.*.name",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.abs_path",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.strings_lists.*.strings",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.value",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.end_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.start_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.access",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.trusted",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_uuid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.virtual_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.virtual_address",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.number_of_stages",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.rva",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.offset",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.md5_phys",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.virtual_size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.physical_size",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.characteristics",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.executed_pages",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.bitsize",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.arguments",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.abs_path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.accesses.*.options",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.accesses.*.disposition",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.md5",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.mime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.sha1",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.sha256",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "sha256"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.file_info",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.create_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.iostatus",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.file_attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.author",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.imphash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.version",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.compile_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.original_filename",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.operations",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.process_id",
-                    "data_type": "string",
-                    "contains": [
-                        "pid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.analysis_subject_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.parent_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.mutex_creates.*.mutex_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.executed_pages",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.accesses.*.disposition",
                     "data_type": "string"
                 },
                 {
@@ -929,7 +465,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.accesses.*.disposition",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.llfile",
                     "data_type": "string"
                 },
                 {
@@ -953,14 +497,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.sha256",
                     "data_type": "string",
                     "contains": [
@@ -969,23 +505,167 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.file_info",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.file_attributes",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.ext_info.create_timestamp",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.iostatus",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.key",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.author",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.data",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.compile_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.value",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.original_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_reads.*.static_pe_information.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_renames.*.existing_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_renames.*.new_file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_searches",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.abs_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.accesses.*.disposition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.accesses.*.options",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.llfile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.mime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.ext_info.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.file_attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.iostatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.author",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.compile_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.original_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_writes.*.static_pe_information.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.frequent_api_calls.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.frequent_api_calls.*.name",
                     "data_type": "string"
                 },
                 {
@@ -1000,23 +680,150 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.frequent_api_calls.*.name",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.end_address",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.frequent_api_calls.*.count",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.loaded_libraries.*.start_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.number_of_stages",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.accesses.*.options",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.access",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.accesses.*.disposition",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.characteristics",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.md5",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.executed_pages",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.md5_phys",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.offset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.physical_size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.rva",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.trusted",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_data.virtual_size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.object_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.stages.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.memory_region_stages.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.mutex_creates.*.mutex_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.mutex_opens.*.mutex_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.dst_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.dst_port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.src_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.src_port",
+                    "data_type": "numeric",
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.analysis_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.llfile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.md5",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -1024,11 +831,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.mime",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.mime",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.sha1",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.sha1",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -1036,15 +843,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.sha256",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.sha256",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -1052,11 +851,39 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.file_info",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.ext_info.size",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.create_timestamp",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.kernel_mode",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.parent_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.analysis_subject_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.arguments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.bitsize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.abs_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.accesses.*.disposition",
                     "data_type": "string"
                 },
                 {
@@ -1064,7 +891,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.accesses.*.disposition",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.llfile",
                     "data_type": "string"
                 },
                 {
@@ -1088,14 +923,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.llfile",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.sha256",
                     "data_type": "string",
                     "contains": [
@@ -1104,47 +931,57 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.file_info",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.file_attributes",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.ext_info.create_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_renames.*.new_file",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.file_renames.*.existing_file",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.service_starts.*.service_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_deletions.*.key",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.hostname",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.filename",
                     "data_type": "string",
                     "contains": [
-                        "host name"
+                        "pe file"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.dns_server",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.iostatus",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.results",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.author",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.dns_queries.*.response_flags",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.compile_timestamp",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.original_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.executable.static_pe_information.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.overview.process.process_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pid"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.patched_sleeps.*.count",
@@ -1159,6 +996,244 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.analysis_subject_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.arguments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.bitsize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.abs_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.accesses.*.disposition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.accesses.*.options",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.llfile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.mime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.ext_info.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.file_attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.iostatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.author",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.compile_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.original_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.executable.static_pe_information.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process.process_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.analysis_subject_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.arguments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.bitsize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.abs_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.accesses.*.disposition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.accesses.*.options",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.create_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.file_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.llfile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.mime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.ext_info.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.file_attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.iostatus",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.author",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.compile_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.original_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.executable.static_pe_information.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.operations",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.process_interactions.*.process_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pid"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.raised_exceptions.*.addr",
                     "data_type": "string"
                 },
@@ -1167,55 +1242,151 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.raised_exceptions.*.exception_count",
+                    "data_type": "numeric"
+                },
+                {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.raised_exceptions.*.exception_name",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.raised_exceptions.*.exception_count",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_deletions.*.key",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_subjects.*.registry_deletions.*.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.type",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.dst_ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.src_ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.dst_port",
-                    "data_type": "numeric",
-                    "contains": [
-                        "port"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.protocol",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.key",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_subjects.*.network_connections.*.src_port",
-                    "data_type": "numeric",
-                    "contains": [
-                        "port"
-                    ]
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_reads.*.value",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.registry_writes.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.service_starts.*.service_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.analysis_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.bitsize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.object_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.object_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.loaded_libraries.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.access",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.executed_pages",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_data.trusted",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.object_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.memory_blocks.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.object_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.pe_images.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.snapshot_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.snapshot_timestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.thread_eips.*.eip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.snapshots.*.thread_eips.*.tid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.strings_lists.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_subjects.*.strings_lists.*.strings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.build_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.major_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.minor_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.name",
                     "data_type": "string"
                 },
                 {
@@ -1223,16 +1394,100 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.report.md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "9657a182c22d26c78872d009298ba7e6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.mime_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "application/pdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.overview.analysis_end",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.type",
+                    "data_path": "action_result.data.*.report.overview.analysis_engine",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.overview.analysis_engine_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.overview.analysis_start",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.overview.analysis_termination_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.detector_id",
+                    "data_type": "string",
+                    "example_value": [
+                        "llweb:prefilter-document-mime-type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.test",
+                    "data_type": "boolean",
+                    "example_value": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.version",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.remarks.info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "lastline task id"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.result_url",
@@ -1243,11 +1498,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.id",
-                    "data_type": "string",
-                    "contains": [
-                        "lastline task id"
-                    ]
+                    "data_path": "action_result.summary.score",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary.target",
@@ -1257,23 +1509,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.type",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.file_name",
-                    "data_type": "string",
-                    "contains": [
-                        "file name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "vault id",
-                        "pe file"
-                    ]
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1316,90 +1557,23 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.summary.id",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
                         "lastline task id"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.result_url",
-                    "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.target",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.uuid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.score",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.build_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.major_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.minor_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.result.detector",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
-                    "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_md5",
@@ -1422,12 +1596,51 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.detector",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.statics.*.code",
@@ -1435,10 +1648,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.statics.*.media_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.strings.*.value",
                     "data_type": "string"
                 },
                 {
@@ -1450,6 +1659,14 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.report.analysis.strings.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.subject.type",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.report.analysis.subject.url",
                     "data_type": "string",
                     "contains": [
@@ -1458,11 +1675,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.subject.type",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.report.analysis_engine_version",
+                    "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.name",
+                    "data_path": "action_result.data.*.report.analysis_error",
                     "data_type": "string"
                 },
                 {
@@ -1470,15 +1687,69 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.name",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.retention_date",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_engine_version",
+                    "data_path": "action_result.data.*.report.extracted_files.*.file_name",
+                    "data_type": "string",
+                    "example_value": [
+                        "test.py"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.extracted_files.*.md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "test6ed13853dfa68bf88a72d649test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.extracted_files.*.mime_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "text/x-python"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.extracted_files.*.sha1",
+                    "data_type": "string",
+                    "example_value": [
+                        "testdae1fecb61ece28e5825729d58c6821test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.extracted_files.*.task_score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.extracted_files.*.task_uuid",
+                    "data_type": "string",
+                    "example_value": [
+                        "test174fe5f700102a7dda179f83test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.build_version",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
+                    "data_path": "action_result.data.*.report.format.major_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.minor_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.name",
                     "data_type": "string"
                 },
                 {
@@ -1486,15 +1757,52 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.report.md5",
+                    "data_type": "string",
+                    "example_value": [
+                        "testd5e4d630bc063b5305d91ce53tes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.mime_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "application/x-gzip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.uuid",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.type",
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "lastline task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.result_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.target",
                     "data_type": "string"
                 },
                 {
@@ -1502,15 +1810,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.type",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "contains": [
-                        "lastline task id"
-                    ]
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1554,76 +1859,15 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.summary.id",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "contains": [
-                        "lastline task id"
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.result_url",
-                    "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.target",
-                    "data_type": "string",
-                    "contains": [
-                        "file name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.uuid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.score",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.build_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.major_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.format.minor_version",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.result.detector",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
+                    "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
                         "url",
@@ -1631,20 +1875,44 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.desc",
                     "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
+                    "example_value": [
+                        "Info: Page contains a form"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.is_test",
+                    "data_type": "boolean",
+                    "example_value": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.name",
+                    "data_type": "string",
+                    "example_value": [
+                        "llweb:info-page-contains-form"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.version",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_md5",
@@ -1667,12 +1935,70 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.error",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type_str",
+                    "data_type": "string",
+                    "example_value": [
+                        "USER"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.task_uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.result.detector",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.statics.*.code",
@@ -1683,7 +2009,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.strings.*.value",
+                    "data_path": "action_result.data.*.report.analysis.statics.*.source_url",
                     "data_type": "string"
                 },
                 {
@@ -1695,6 +2021,14 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.report.analysis.strings.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis.subject.type",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.report.analysis.subject.url",
                     "data_type": "string",
                     "contains": [
@@ -1703,7 +2037,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis.subject.type",
+                    "data_path": "action_result.data.*.report.analysis_engine_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.metadata_type",
                     "data_type": "string"
                 },
                 {
@@ -1711,19 +2049,30 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_metadata.*.metadata_type",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.retention_date",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.report.analysis_engine_version",
+                    "data_path": "action_result.data.*.report.analysis_metadata.*.timestamp",
+                    "data_type": "numeric",
+                    "example_value": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.build_version",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
+                    "data_path": "action_result.data.*.report.format.major_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.minor_version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.format.name",
                     "data_type": "string"
                 },
                 {
@@ -1731,24 +2080,93 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.report.malicious_activity.*.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.activity",
+                    "data_type": "string",
+                    "example_value": [
+                        "A script used the fromCharCode function"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.detector_id",
+                    "data_type": "string",
+                    "example_value": [
+                        "llweb:prefilter-from-char-code-function"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.test",
+                    "data_type": "boolean",
+                    "example_value": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_scanners.*.version",
+                    "data_type": "numeric",
+                    "example_value": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.prefilter_score",
+                    "data_type": "numeric",
+                    "example_value": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report.uuid",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string",
+                    "contains": [
+                        "lastline task id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.result_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.target",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url",
-                        "domain"
-                    ]
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
