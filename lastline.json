@@ -42,7 +42,7 @@
             "defualt": 120
         },
         "license_key": {
-            "data_type": "string",
+            "data_type": "password",
             "order": 3,
             "description": "License Key",
             "required": true
