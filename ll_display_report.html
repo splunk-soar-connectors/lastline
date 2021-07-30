@@ -102,7 +102,7 @@ a:hover {
   <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.summary.target }}' }], 0, {{ container.id }}, null, false);">
     {{ result.summary.target }}
-    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
   </td>
   {% else %}
@@ -117,7 +117,7 @@ a:hover {
   <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': ['lastline task id'], 'value': '{{ result.summary.id }}' }], 0, {{ container.id }}, null, false);">
     {{ result.summary.id }}
-    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
   </td>
 </tr>
@@ -141,7 +141,7 @@ a:hover {
   <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ result.report.md5 }}' }], 0, {{ container.id }}, null, false);">
     {{ result.report.md5 }}
-    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
   </td>
 </tr>
@@ -172,13 +172,13 @@ a:hover {
     <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_req.url }}' }], 0, {{ container.id }}, null, false);">
     {{ curr_req.url }}
-    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
     </td>
     <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_req.ip }}' }], 0, {{ container.id }}, null, false);">
     {{ curr_req.ip }}
-    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
     </td>
   </tr>
