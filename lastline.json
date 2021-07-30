@@ -36,26 +36,26 @@
         },
         "timeout": {
             "data_type": "numeric",
-            "order": 2,
+            "order": 5,
             "description": "Timeout (seconds)",
             "required": true,
             "defualt": 120
         },
         "license_key": {
             "data_type": "password",
-            "order": 3,
+            "order": 2,
             "description": "License Key",
             "required": true
         },
         "api_token": {
             "data_type": "password",
-            "order": 4,
+            "order": 3,
             "description": "API Token",
             "required": true
         },
         "account_username": {
             "data_type": "string",
-            "order": 5,
+            "order": 4,
             "description": "Push Account"
         }
     },
