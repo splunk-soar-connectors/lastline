@@ -307,9 +307,9 @@ class LastlineConnector(BaseConnector):
             success, message, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = list(vault_info)[0]
         except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None, None
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None, None
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None
 
         return phantom.APP_SUCCESS, vault_info
 
