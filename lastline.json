@@ -18,7 +18,7 @@
     "license": "Copyright (c) 2015-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_versions": [
-        ""
+        "API Version 2021.5 on August 01, 2021"
     ],
     "configuration": {
         "base_url": {
@@ -1850,8 +1850,7 @@
                     "data_type": "string",
                     "order": 0,
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ],
                     "required": true,
                     "primary": true
@@ -1870,8 +1869,7 @@
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ]
                 },
                 {
@@ -1957,8 +1955,7 @@
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.parent_url",
                     "data_type": "string",
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ]
                 },
                 {
@@ -1988,8 +1985,7 @@
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
                     "data_type": "string",
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ]
                 },
                 {
@@ -2032,8 +2028,7 @@
                     "data_path": "action_result.data.*.report.analysis.subject.url",
                     "data_type": "string",
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ]
                 },
                 {
@@ -2145,8 +2140,7 @@
                     "data_path": "action_result.summary.result_url",
                     "data_type": "string",
                     "contains": [
-                        "url",
-                        "domain"
+                        "url"
                     ]
                 },
                 {
