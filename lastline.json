@@ -18,7 +18,7 @@
     "license": "Copyright (c) 2015-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_versions": [
-        "API Version 2021.5 on August 01, 2021"
+        "Cloud, Version 2021.5 on August 01, 2021"
     ],
     "configuration": {
         "base_url": {
