@@ -106,6 +106,10 @@
                     "data_type": "string",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "abc.pdf",
+                        "pip.exe"
                     ]
                 },
                 {
@@ -114,6 +118,9 @@
                     "contains": [
                         "vault id",
                         "pe file"
+                    ],
+                    "example_values": [
+                        "0c96c0561edabf40928e49f0589b9bf41ef70fea"
                     ]
                 },
                 {
@@ -1487,6 +1494,9 @@
                     "data_type": "string",
                     "contains": [
                         "lastline task id"
+                    ],
+                    "example_values": [
+                        "test35be81a8001007bd9a6056161111"
                     ]
                 },
                 {
@@ -1495,34 +1505,55 @@
                     "contains": [
                         "url",
                         "domain"
+                    ],
+                    "example_values": [
+                        "https://test.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.target",
                     "data_type": "string",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "Unknown"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1569,6 +1600,9 @@
                     "data_type": "string",
                     "contains": [
                         "lastline task id"
+                    ],
+                    "example_values": [
+                        "test35be81a8001007bd9a605616test"
                     ]
                 },
                 {
@@ -1787,6 +1821,9 @@
                     "data_type": "string",
                     "contains": [
                         "lastline task id"
+                    ],
+                    "example_values": [
+                        "test35be81a8001007bd9a6056161111"
                     ]
                 },
                 {
@@ -1795,35 +1832,55 @@
                     "contains": [
                         "url",
                         "domain"
+                    ],
+                    "example_values": [
+                        "https://test.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.target",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.target",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "example_values": [
+                        "Unknown"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1870,6 +1927,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://www.test.com"
                     ]
                 },
                 {
@@ -2134,41 +2194,66 @@
                     "data_type": "string",
                     "contains": [
                         "lastline task id"
+                    ],
+                    "example_values": [
+                        "test35be81a8001007bd9a6056161111"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.result_url",
                     "data_type": "string",
                     "contains": [
-                        "url"
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "https://test.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.score",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.target",
                     "data_type": "string",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "Unknown"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
