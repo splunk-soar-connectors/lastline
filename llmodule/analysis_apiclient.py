@@ -1,4 +1,10 @@
-#!/usr/bin/python
+# File: analysis_apiclient.py
+# Copyright (c) 2015-2021 Splunk Inc.
+#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
+
+# !/usr/bin/python
 """
 This is a Python client for the Lastline Analyst API.
 
@@ -66,19 +72,20 @@ import time
 
 try:
     import json
-    import StringIO
+    import io
     import requests
+
     if __name__ == "__main__":
         import optparse
         import IPython
-except ImportError, e:
+except ImportError as e:
     if __name__ == "__main__":
-        print >> sys.stderr, "A module required for running the analysis API example shell was not found:"
-        print >> sys.stderr, "\t'%s'" % str(e)
-        print >> sys.stderr, "Please install the missing module."
-        print >> sys.stderr, "For this, you can use tools such as easy_install or pip:"
-        print >> sys.stderr, "\t easy_install <MODULE_NAME>"
-        print >> sys.stderr, "\t pip install <MODULE_NAME>"
+        print(sys.stderr, "A module required for running the analysis API example shell was not found:")
+        print(sys.stderr, "\t'%s'" % str(e))
+        print(sys.stderr, "Please install the missing module.")
+        print(sys.stderr, "For this, you can use tools such as easy_install or pip:")
+        print(sys.stderr, "\t easy_install <MODULE_NAME>")
+        print(sys.stderr, "\t pip install <MODULE_NAME>")
         sys.exit(1)
     else:
         raise
@@ -95,10 +102,9 @@ try:
         raise Exception()
 except Exception:
     requests_version = '?'
-    print >> sys.stderr, "Warning: Your version of requests (%s) might not " \
-                         "be compatible with this module." % requests_version
-    print >> sys.stderr, "Officially supported are versions 2.2.x"
-
+    print(sys.stderr, "Warning: Your version of requests (%s) might not " \
+                      "be compatible with this module." % requests_version)
+    print(sys.stderr, "Officially supported are versions 2.2.x")
 
 # copied these values from Lastline utility code (llapi) to make them available
 # to users of client code. please keep in sync!
@@ -137,34 +143,37 @@ class InvalidSubApiType(Error):
     Operations involving parts other than these will
     raise this exceptions.
     """
+
     def __init__(self, sub_api_type):
         Error.__init__(self)
         self.sub_api_type = sub_api_type
 
     def __str__(self):
         return "Invalid sub API '%s', expecting one of (%s)" % (
-                        self.sub_api_type,
-                        ','.join(AnalysisClientBase.SUB_APIS))
+            self.sub_api_type,
+            ','.join(AnalysisClientBase.SUB_APIS))
 
 
 class InvalidFormat(Error):
     """
     Invalid format requested.
     """
+
     def __init__(self, requested_format):
         Error.__init__(self)
         self.format = requested_format
 
     def __str__(self):
         return "Requested Invalid Format '%s', expecting one of (%s)" % (
-                         self.format,
-                         ','.join(AnalysisClientBase.FORMATS))
+            self.format,
+            ','.join(AnalysisClientBase.FORMATS))
 
 
 class CommunicationError(Error):
     """
     Contacting Malscape failed.
     """
+
     def __init__(self, msg=None, error=None):
         Error.__init__(self, msg or error or '')
         self.__error = error
@@ -186,6 +195,7 @@ class AnalysisAPIError(Error):
     The `error_code` member of this exception
     is the :ref:`error code returned by the API<error_codes>`.
     """
+
     def __init__(self, msg, error_code):
         Error.__init__(self)
         self.msg = msg
@@ -290,7 +300,6 @@ class FileExtractionFailedError(SubmissionInvalidError):
         SubmissionInvalidError.__init__(self, msg, error_code)
 
 
-
 #################
 # client
 #################
@@ -314,7 +323,7 @@ def purge_none(d):
     """
     Purge None entries from a dictionary
     """
-    for k in d.keys():
+    for k in list(d.keys()):
         if d[k] is None:
             del d[k]
     return d
@@ -334,21 +343,23 @@ def parse_datetime(d):
     """
     if hasattr(d, "year") and hasattr(d, "month") and hasattr(d, "day"):
         return datetime.datetime(d.year, d.month, d.day)
-    
+
     try:
         return datetime.datetime.strptime(
             d, AnalysisClientBase.DATETIME_MSEC_FMT)
-    except ValueError: pass
+    except ValueError:
+        pass
 
     try:
         return datetime.datetime.strptime(d, AnalysisClientBase.DATETIME_FMT)
-    except ValueError: pass
-    
+    except ValueError:
+        pass
+
     try:
         return datetime.datetime.strptime(d, AnalysisClientBase.DATE_FMT)
     except ValueError:
         raise ValueError("Date '%s' does not match format '%s'" % (
-                         d, "%Y-%m-%d[ %H:%M:%S[.%f]]'"))
+            d, "%Y-%m-%d[ %H:%M:%S[.%f]]'"))
 
 
 class TaskCompletion(object):
@@ -364,9 +375,10 @@ class TaskCompletion(object):
         print completed_task.task_uuid, completed_task.score
     
     """
+
     def __init__(self, analysis_client):
         self.__analysis_client = analysis_client
-    
+
     def get_completed(self, after, before):
         """
         Return scores of tasks completed in the specified time range.
@@ -388,32 +400,32 @@ class TaskCompletion(object):
                     after=after,
                     before=before,
                     include_score=True)
-                
+
                 data = result["data"]
                 tasks = data["tasks"]
                 if not tasks:
                     break
-                
-                for task_uuid, score  in tasks.iteritems():
+
+                for task_uuid, score in tasks.items():
                     yield CompletedTask(task_uuid=task_uuid,
                                         score=score)
-                
+
                 more = int(data["more_results_available"])
                 if not more:
                     break
-                
+
                 last_ts = parse_datetime(data["before"])
                 if last_ts >= before:
                     break
-                
+
                 after = last_ts
-                
+
         except (KeyError, ValueError, TypeError, AttributeError):
             # attributeError needed in case iteritems is missing (not a dict)
             # let's give it the trace of the original exception, so we know
             # what the specific problem is!
             trace = sys.exc_info()[2]
-            raise InvalidAnalysisAPIResponse("Unable to parse response to get_completed()"), None, trace
+            raise InvalidAnalysisAPIResponse("Unable to parse response to get_completed()").with_traceback(trace)
 
 
 class AnalysisClientBase(object):
@@ -455,7 +467,7 @@ class AnalysisClientBase(object):
         ANALYSIS_API_INVALID_URL: InvalidURLError,
         ANALYSIS_API_INVALID_REPORT_VERSION: InvalidReportVersionError,
         ANALYSIS_API_FILE_EXTRACTION_FAILED: FileExtractionFailedError,
-      }
+    }
 
     def __init__(self, base_url, logger=None, config=None):
         self.__logger = logger
@@ -512,54 +524,54 @@ class AnalysisClientBase(object):
         Deprecated version of submit_file_hash() - see below
         """
         return self.submit_file_hash(md5, sha1,
-                        download_ip=download_ip,
-                        download_port=download_port,
-                        download_url=download_url,
-                        download_host=download_host,
-                        download_path=download_path,
-                        download_agent=download_agent,
-                        download_referer=download_referer,
-                        download_request=download_request,
-                        full_report_score=full_report_score,
-                        bypass_cache=bypass_cache,
-                        raw=raw,
-                        verify=verify)
+                                     download_ip=download_ip,
+                                     download_port=download_port,
+                                     download_url=download_url,
+                                     download_host=download_host,
+                                     download_path=download_path,
+                                     download_agent=download_agent,
+                                     download_referer=download_referer,
+                                     download_request=download_request,
+                                     full_report_score=full_report_score,
+                                     bypass_cache=bypass_cache,
+                                     raw=raw,
+                                     verify=verify)
 
     def submit_file_hash(self,
-                        md5=None,
-                        sha1=None,
-                        download_ip=None,
-                        download_port=None,
-                        download_url=None,
-                        download_host=None,
-                        download_path=None,
-                        download_agent=None,
-                        download_referer=None,
-                        download_request=None,
-                        full_report_score=None,
-                        bypass_cache=None,
-                        backend=None,
-                        require_file_analysis=True,
-                        mime_type=None,
-                        analysis_timeout=None,
-                        analysis_env=None,
-                        allow_network_traffic=None,
-                        filename=None,
-                        keep_file_dumps=None,
-                        keep_memory_dumps=None,
-                        keep_behavior_log=None,
-                        push_to_portal_account=None,
-                        raw=False,
-                        verify=True,
-                        server_ip=None,
-                        server_port=None,
-                        server_host=None,
-                        client_ip=None,
-                        client_port=None,
-                        is_download=True,
-                        protocol="http",
-                        apk_package_name=None,
-                        report_version=None):
+                         md5=None,
+                         sha1=None,
+                         download_ip=None,
+                         download_port=None,
+                         download_url=None,
+                         download_host=None,
+                         download_path=None,
+                         download_agent=None,
+                         download_referer=None,
+                         download_request=None,
+                         full_report_score=None,
+                         bypass_cache=None,
+                         backend=None,
+                         require_file_analysis=True,
+                         mime_type=None,
+                         analysis_timeout=None,
+                         analysis_env=None,
+                         allow_network_traffic=None,
+                         filename=None,
+                         keep_file_dumps=None,
+                         keep_memory_dumps=None,
+                         keep_behavior_log=None,
+                         push_to_portal_account=None,
+                         raw=False,
+                         verify=True,
+                         server_ip=None,
+                         server_port=None,
+                         server_host=None,
+                         client_ip=None,
+                         client_port=None,
+                         is_download=True,
+                         protocol="http",
+                         apk_package_name=None,
+                         report_version=None):
         """
         Submit a file by hash.
 
@@ -698,25 +710,18 @@ class AnalysisClientBase(object):
             "protocol": protocol,
             "apk_package_name": apk_package_name,
             "report_version": report_version,
-          })
+        })
         # using and-or-trick to convert to a StringIO if it is not None
         # this just wraps it into a file-like object
         files = purge_none({
-            "download_url": download_url is not None and \
-                               StringIO.StringIO(download_url) or None,
-            "download_host": download_host is not None and \
-                               StringIO.StringIO(download_host) or None,
-            "download_path": download_path is not None and \
-                               StringIO.StringIO(download_path) or None,
-            "download_agent": download_agent is not None and \
-                               StringIO.StringIO(download_agent) or None,
-            "download_referer": download_referer is not None and \
-                               StringIO.StringIO(download_referer) or None,
-            "download_request": download_request is not None and \
-                               StringIO.StringIO(download_request) or None,
-            "server_host": server_host is not None and \
-                               StringIO.StringIO(server_host) or None,
-          })
+            "download_url": download_url is not None and io.StringIO(download_url) or None,
+            "download_host": download_host is not None and io.StringIO(download_host) or None,
+            "download_path": download_path is not None and io.StringIO(download_path) or None,
+            "download_agent": download_agent is not None and io.StringIO(download_agent) or None,
+            "download_referer": download_referer is not None and io.StringIO(download_referer) or None,
+            "download_request": download_request is not None and io.StringIO(download_request) or None,
+            "server_host": server_host is not None and io.StringIO(server_host) or None,
+        })
         return self._api_request(url, params, files=files, post=True,
                                  raw=raw, verify=verify)
 
@@ -741,19 +746,19 @@ class AnalysisClientBase(object):
         Deprecated version of submit_file() - see below
         """
         return self.submit_file(file_stream,
-                        download_ip=download_ip,
-                        download_port=download_port,
-                        download_url=download_url,
-                        download_host=download_host,
-                        download_path=download_path,
-                        download_agent=download_agent,
-                        download_referer=download_referer,
-                        download_request=download_request,
-                        full_report_score=full_report_score,
-                        bypass_cache=bypass_cache,
-                        delete_after_analysis=delete_after_analysis,
-                        raw=raw,
-                        verify=verify)
+                                download_ip=download_ip,
+                                download_port=download_port,
+                                download_url=download_url,
+                                download_host=download_host,
+                                download_path=download_path,
+                                download_agent=download_agent,
+                                download_referer=download_referer,
+                                download_request=download_request,
+                                full_report_score=full_report_score,
+                                bypass_cache=bypass_cache,
+                                delete_after_analysis=delete_after_analysis,
+                                raw=raw,
+                                verify=verify)
 
     def submit_file(self, file_stream,
                     download_ip=None,
@@ -918,7 +923,7 @@ class AnalysisClientBase(object):
             "apk_package_name": apk_package_name,
             "password": password,
             "report_version": report_version,
-          })
+        })
 
         # If an explicit filename was provided, we can pass it down to
         # python-requests to use it in the multipart/form-data.
@@ -930,35 +935,31 @@ class AnalysisClientBase(object):
         # this just wraps it into a file-like object
         files = purge_none({
             "file": named_stream,
-            "download_url": download_url is not None and \
-                                  StringIO.StringIO(download_url) or None,
-            "download_host": download_host is not None and \
-                                  StringIO.StringIO(download_host) or None,
-            "download_path": download_path is not None and \
-                                  StringIO.StringIO(download_path) or None,
-            "download_agent": download_agent is not None and \
-                                  StringIO.StringIO(download_agent) or None,
-            "download_referer": download_referer is not None and \
-                                  StringIO.StringIO(download_referer) or None,
-            "download_request": download_request is not None and \
-                                  StringIO.StringIO(download_request) or None,
-            "server_host": server_host is not None and \
-                                  StringIO.StringIO(server_host) or None,
-          })
-        return self._api_request(url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
+            "download_url": download_url is not None and io.StringIO(download_url) or None,
+            "download_host": download_host is not None and io.StringIO(download_host) or None,
+            "download_path": download_path is not None and io.StringIO(download_path) or None,
+            "download_agent": download_agent is not None and io.StringIO(download_agent) or None,
+            "download_referer": download_referer is not None and io.StringIO(download_referer) or None,
+            "download_request": download_request is not None and io.StringIO(download_request) or None,
+            "server_host": server_host is not None and io.StringIO(server_host) or None,
+        })
 
+        try:
+            result = self._api_request(url, params, files=files, post=True, raw=raw, verify=verify)
+        except Exception as ex:
+            raise ex
+        return result
 
     def submit_file_metadata(self, md5, sha1,
-                                   download_ip,
-                                   download_port,
-                                   download_host=None,
-                                   download_path=None,
-                                   download_agent=None,
-                                   download_referer=None,
-                                   download_request=None,
-                                   raw=False,
-                                   verify=True):
+                             download_ip,
+                             download_port,
+                             download_host=None,
+                             download_path=None,
+                             download_agent=None,
+                             download_referer=None,
+                             download_request=None,
+                             raw=False,
+                             verify=True):
         """
         Submit metadata regarding a file download.
 
@@ -995,27 +996,20 @@ class AnalysisClientBase(object):
             "sha1": sha1,
             "download_ip": download_ip,
             "download_port": download_port
-          }
-        #using and-or-trick to convert to a StringIO if it is not None
-        #this just wraps it into a file-like object
+        }
+        # using and-or-trick to convert to a StringIO if it is not None
+        # this just wraps it into a file-like object
         files = {
-            "download_host": download_host is not None and \
-                                   StringIO.StringIO(download_host) or None,
-            "download_path": download_path is not None and \
-                                   StringIO.StringIO(download_path) or None,
-            "download_agent": download_agent is not None and \
-                                   StringIO.StringIO(download_agent) or None,
-            "download_referer": download_referer is not None and \
-                                   StringIO.StringIO(download_referer) or None,
-            "download_request": download_request is not None and \
-                                   StringIO.StringIO(download_request) or None
+            "download_host": download_host is not None and io.StringIO(download_host) or None,
+            "download_path": download_path is not None and io.StringIO(download_path) or None,
+            "download_agent": download_agent is not None and io.StringIO(download_agent) or None,
+            "download_referer": download_referer is not None and io.StringIO(download_referer) or None,
+            "download_request": download_request is not None and io.StringIO(download_request) or None
 
-          }
+        }
         purge_none(files)
         purge_none(params)
-        return self._api_request(url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
-
+        return self._api_request(url, params, files=files, post=True, raw=raw, verify=verify)
 
     def submit_url(self,
                    url,
@@ -1064,17 +1058,16 @@ class AnalysisClientBase(object):
 
         api_url = self.__build_url("analysis", ["submit", "url"])
         params = purge_none({
-            "url":url,
-            "referer":referer,
-            "full_report_score":full_report_score,
-            "bypass_cache":bypass_cache and 1 or None,
+            "url": url,
+            "referer": referer,
+            "full_report_score": full_report_score,
+            "bypass_cache": bypass_cache and 1 or None,
             "analysis_timeout": analysis_timeout or None,
             "push_to_portal_account": push_to_portal_account or None,
             "user_agent": user_agent or None,
-            "report_version" : report_version,
-          })
-        return self._api_request(api_url, params, post=True,
-                                 raw=raw, verify=verify)
+            "report_version": report_version,
+        })
+        return self._api_request(api_url, params, post=True, raw=raw, verify=verify)
 
     def get_result(self,
                    uuid,
@@ -1121,7 +1114,7 @@ class AnalysisClientBase(object):
             'full_report_score': full_report_score,
             'include_scoring_components': include_scoring_components and 1 or 0,
             'report_version': report_version
-          })
+        })
         if requested_format.lower() != 'json':
             raw = True
         return self._api_request(url,
@@ -1157,7 +1150,7 @@ class AnalysisClientBase(object):
         params = {
             'uuid': uuid,
             'score_only': score_only and 1 or 0,
-          }
+        }
         if requested_format.lower() != "json":
             raw = True
         return self._api_request(url,
@@ -1186,7 +1179,7 @@ class AnalysisClientBase(object):
         params = {
             'uuid': uuid,
             'artifact_uuid': "%s:%s" % (report_uuid, artifact_name)
-          }
+        }
 
         # NOTE: This API request is completely different because it
         # returns real HTTP status-codes (and errors) directly
@@ -1196,11 +1189,10 @@ class AnalysisClientBase(object):
             if not result:
                 raise InvalidArtifactError()
 
-        except CommunicationError, exc:
+        except CommunicationError as exc:
             internal_error = str(exc.internal_error())
             if internal_error == '410':
-                raise InvalidArtifactError("The artifact is no longer " \
-                                           "available")
+                raise InvalidArtifactError("The artifact is no longer available")
             if internal_error == '404':
                 raise InvalidArtifactError("The artifact could not be found")
 
@@ -1217,7 +1209,7 @@ class AnalysisClientBase(object):
             # original CommunicationError
             raise
 
-        return StringIO.StringIO(result)
+        return io.StringIO(result)
 
     def query_task_artifact(self, uuid, artifact_name, raw=False, verify=True):
         """
@@ -1232,7 +1224,7 @@ class AnalysisClientBase(object):
         params = purge_none({
             'uuid': uuid,
             'artifact_name': artifact_name,
-          })
+        })
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def completed(self, after, before=None, raw=False, verify=True):
@@ -1283,7 +1275,7 @@ class AnalysisClientBase(object):
             'before': before,
             'after': after,
             'include_score': include_score and 1 or 0,
-          })
+        })
         return self._api_request(url, params, raw=raw, post=True, verify=verify)
 
     def get_progress(self, uuid, raw=False):
@@ -1302,7 +1294,7 @@ class AnalysisClientBase(object):
         :param requested_format: JSON or XML. If format is not JSON, this implies `raw`.
         """
         url = self.__build_url('analysis', ['get_progress'])
-        params = { 'uuid': uuid }
+        params = {'uuid': uuid}
         return self._api_request(url, params, raw=raw, post=True)
 
     def query_file_hash(self, hash_value=None, algorithm=None, block_size=None,
@@ -1343,7 +1335,7 @@ class AnalysisClientBase(object):
             'hash_value': hash_value,
             'hash_algorithm': algorithm,
             'hash_block_size': block_size,
-          })
+        })
         return self._api_request(url, params, raw=raw, post=True)
 
     def is_blocked_file_hash(self, hash_value=None, algorithm=None,
@@ -1385,7 +1377,7 @@ class AnalysisClientBase(object):
             'hash_value': hash_value,
             'hash_algorithm': algorithm,
             'hash_block_size': block_size,
-          })
+        })
         return self._api_request(url, params, raw=raw, post=True)
 
     def query_analysis_engine_tasks(self, analysis_engine_task_uuids,
@@ -1445,11 +1437,11 @@ class AnalysisClientBase(object):
         """
         url = self.__build_url('analysis', ['analyze_sandbox_result'])
         params = {
-            'analysis_task_uuid':analysis_task_uuid,
+            'analysis_task_uuid': analysis_task_uuid,
             'analysis_engine': analysis_engine,
             'full_report_score': full_report_score,
             'bypass_cache': bypass_cache and 1 or None,
-          }
+        }
         purge_none(params)
         return self._api_request(url, params, raw=raw)
 
@@ -1482,8 +1474,8 @@ class AnalysisClientBase(object):
         if raw or requested_format.lower() != "json":
             return page
 
-        #why does pylint think result is a bool??
-        #pylint: disable=E1103
+        # why does pylint think result is a bool??
+        # pylint: disable=E1103
         result = json.loads(page)
         success = result['success']
         if success:
@@ -1491,8 +1483,7 @@ class AnalysisClientBase(object):
         else:
             error_code = result.get('error_code', None)
             # raise the most specific error we can
-            exception_class = AnalysisClientBase.ERRORS.get(error_code) or \
-                              AnalysisAPIError
+            exception_class = AnalysisClientBase.ERRORS.get(error_code) or AnalysisAPIError
             raise exception_class(result['error'], error_code)
 
     def rescore_task(self, uuid=None, md5=None, sha1=None,
@@ -1607,6 +1598,7 @@ class AnalysisClientBase(object):
         DEPRECATED. DO NOT USE
         """
         assert False, "Call to deprecated API function"
+
     # pylint: enable=W0613
 
     def get_detections(self, report_uuid, raw=False):
@@ -1616,8 +1608,8 @@ class AnalysisClientBase(object):
         :param report_uuid: Backend-report UUID as returned by `get_result`
         :returns: Dictionary with detailed detection information
         """
-        url = self.__build_url('research', [ 'get_detections' ])
-        params = { 'report_uuid': report_uuid }
+        url = self.__build_url('research', ['get_detections'])
+        params = {'report_uuid': report_uuid}
         return self._api_request(url, params, raw=raw, post=True)
 
     def get_backend_scores(self, md5=None, sha1=None, raw=False):
@@ -1630,7 +1622,7 @@ class AnalysisClientBase(object):
         :returns: Dictionary with detailed detection information
         """
         assert md5 or sha1, "Need to provide one of md5/sha1"
-        url = self.__build_url('research', [ 'get_backend_scores' ])
+        url = self.__build_url('research', ['get_backend_scores'])
         params = purge_none({
             'file_md5': md5,
             'file_sha1': sha1,
@@ -1661,6 +1653,7 @@ class AnalysisClient(AnalysisClientBase):
     :param timeout: default timeout (in seconds) to use for network requests.
         Set to None to disable timeouts
     """
+
     def __init__(self,
                  base_url,
                  key,
@@ -1731,7 +1724,7 @@ class AnalysisClient(AnalysisClientBase):
             verify_ca_bundle = True
 
         try:
-            response = self.__session.\
+            response = self.__session. \
                 request(method, url,
                         params=params, data=data, files=files,
                         timeout=timeout or self.__timeout,
@@ -1739,7 +1732,7 @@ class AnalysisClient(AnalysisClientBase):
                         proxies=self.__proxies)
             # raise if anything went wrong
             response.raise_for_status()
-        except requests.RequestException, exc:
+        except requests.RequestException as exc:
             if self.__logger:
                 self.__logger.error("Error contacting Malscape API: %s", exc)
             # raise a wrapped exception
@@ -1755,22 +1748,27 @@ class AnalysisClient(AnalysisClientBase):
         else:
             data = response.content
 
-        return self._process_response_page(data, raw, requested_format)
+        try:
+            result = self._process_response_page(data, raw, requested_format)
+        except Exception as ex:
+            raise ex
+
+        return result
 
 
 def init_shell(banner):
     """Set up the iPython shell."""
     try:
-        #this import can fail, that's why it's in a try block!
-        #pylint: disable=E0611
-        #pylint: disable=F0401
-        from IPython.frontend.terminal.embed import InteractiveShellEmbed #@UnresolvedImport
-        #pylint: enable=E0611
-        #pylint: enable=F0401
+        # this import can fail, that's why it's in a try block!
+        # pylint: disable=E0611
+        # pylint: disable=F0401
+        from IPython.frontend.terminal.embed import InteractiveShellEmbed  # @UnresolvedImport
+        # pylint: enable=E0611
+        # pylint: enable=F0401
         shell = InteractiveShellEmbed(banner1=banner)
-    except ImportError: # iPython < 0.11
+    except ImportError:  # iPython < 0.11
         # iPython <0.11 does have a Shell member
-        shell = IPython.Shell.IPShellEmbed() #pylint: disable=E1101
+        shell = IPython.Shell.IPShellEmbed()  # pylint: disable=E1101
         shell.set_banner(banner)
 
     return shell
@@ -1790,6 +1788,8 @@ advantage of tab auto-completion and other
 convenient features of IPython.
 """
 URL = "https://analysis.lastline.com"
+
+
 def main(argv):
     parser = optparse.OptionParser(usage="""
 Run client for analysis api with the provided credentials
@@ -1798,18 +1798,17 @@ Run client for analysis api with the provided credentials
 
 """)
     parser.add_option("-u", "--api-url", dest="api_url",
-        type="string", default=URL,
-        help="send API requests to this URL (debugging purposes)")
+                      type="string", default=URL,
+                      help="send API requests to this URL (debugging purposes)")
 
     (cmdline_options, args) = parser.parse_args(argv[1:])
     if len(args) != 2:
         parser.print_help()
         return 1
 
-    namespace = {}
-    namespace["analysis"] = AnalysisClient(cmdline_options.api_url,
-                                           key=args[0],
-                                           api_token=args[1])
+    namespace = {"analysis": AnalysisClient(cmdline_options.api_url,
+                                            key=args[0],
+                                            api_token=args[1])}
 
     shell = init_shell(BANNER)
     shell(local_ns=namespace, global_ns=namespace)
@@ -1819,4 +1818,3 @@ Run client for analysis api with the provided credentials
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
-
