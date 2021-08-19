@@ -19,7 +19,7 @@ from datetime import datetime
 import time
 import hashlib
 
-RESULTS_URL_TEMPLATE = 'https://user.lastline.com/malscape/#/task/{}'
+RESULTS_URL_TEMPLATE = 'https://user.lastline.com/portal#/analyst/task/{}'
 
 
 class LastlineConnector(BaseConnector):
