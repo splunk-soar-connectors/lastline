@@ -63,7 +63,7 @@
         {
             "action": "detonate file",
             "description": "Run the file in the Lastline sandbox and retrieve the analysis results",
-            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.",
+            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter. <br/> This action supports PE, PDF, doc, etc. for analysis.",
             "type": "investigate",
             "identifier": "detonate file",
             "read_only": true,
