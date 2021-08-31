@@ -19,7 +19,7 @@ from datetime import datetime
 import time
 import hashlib
 
-RESULTS_URL_TEMPLATE = 'https://user.lastline.com/malscape/#/task/{}'
+RESULTS_URL_TEMPLATE = 'https://user.lastline.com/portal#/analyst/task/{}'
 
 
 class LastlineConnector(BaseConnector):
@@ -28,6 +28,7 @@ class LastlineConnector(BaseConnector):
     ACTION_ID_QUERY_FILE = "detonate file"
     ACTION_ID_QUERY_URL = "detonate url"
     ACTION_ID_SANDBOX_RESULTS = "get report"
+    IsURLDetonation = 0
 
     def __init__(self):
 
@@ -60,7 +61,7 @@ class LastlineConnector(BaseConnector):
             score = response['data']['score']
         except:
             pass
-        if score:
+        if score is not None:
             report['score'] = score
 
         md5 = None
@@ -171,24 +172,26 @@ class LastlineConnector(BaseConnector):
         # unfortunately in case 'get result' we don't know what type of detonation it was
 
         # if url is present return that
-        try:
-            return "url", report[ANALYSIS_KEY]['subject']['url']
-        except:
-            pass
+        if self.IsURLDetonation:
+            try:
+                return "url", report[ANALYSIS_KEY]['subject']['url']
+            except:
+                return "url", 'Unknown'
 
-        # it's a file detonation, so need to get in roundabout way
-        try:
-            entry = report[ANALYSIS_SUBJECT_KEY][0]
-            subj_id = entry.get('overview', {}).get('process', {}).get('analysis_subject_id')
-            this_id = entry.get('overview', {}).get('id')
-            if subj_id == this_id:
-                target = entry.get('process', {}).get('executable', {}).get('static_pe_information', {}).get('original_filename')
-                if not target:
-                    target = entry.get('overview', {}).get('process', {}).get('executable', {}).get('filename', '').split('\\')[-1]
-        except Exception as e:
-            self.debug_print("Handled Exception: ", e)
+        else:
+            # it's a file detonation, so need to get in roundabout way
+            try:
+                entry = report[ANALYSIS_SUBJECT_KEY][0]
+                subj_id = entry.get('overview', {}).get('process', {}).get('analysis_subject_id')
+                this_id = entry.get('overview', {}).get('id')
+                if subj_id == this_id:
+                    target = entry.get('process', {}).get('executable', {}).get('static_pe_information', {}).get('original_filename')
+                    if not target:
+                        target = entry.get('overview', {}).get('process', {}).get('executable', {}).get('filename', '').split('\\')[-1]
+            except Exception as e:
+                self.debug_print("Handled Exception: ", e)
 
-        return 'file', 'Unknown'
+            return 'file', 'Unknown'
 
     def _update_report_summary(self, report, action_result, task_id):
 
@@ -277,7 +280,7 @@ class LastlineConnector(BaseConnector):
         return phantom.APP_ERROR, None, None
 
     def _query_url(self, param):
-
+        self.IsURLDetonation = 1
         action_result = self.add_action_result(ActionResult(param))
 
         task_start_time = datetime.utcnow()
