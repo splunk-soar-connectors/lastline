@@ -20,16 +20,16 @@ import time
 import hashlib
 
 
-
 class LastlineConnector(BaseConnector):
 
     # The actions supported by this connector
     ACTION_ID_QUERY_FILE = "detonate file"
     ACTION_ID_QUERY_URL = "detonate url"
     ACTION_ID_SANDBOX_RESULTS = "get report"
-    
+
     IsURLDetonation = 0
     RESULTS_URL_TEMPLATE = None
+
     def __init__(self):
 
         # Call the BaseConnectors init first
@@ -47,7 +47,7 @@ class LastlineConnector(BaseConnector):
             config['api_token'], verify_ssl=config.get('verify_server_cert', True)
         )
         self._account_name = config.get('account_username')
-        self._report_url = config.get('report_url','https://user.lastline.com')
+        self._report_url = config.get('report_url', 'https://user.lastline.com')
         self.RESULTS_URL_TEMPLATE = self._report_url + '/portal#/analyst/task/{}'
 
         return phantom.APP_SUCCESS
@@ -127,7 +127,6 @@ class LastlineConnector(BaseConnector):
                 report[ANALYSIS_KEY]['subject']['url'] = response['data']['analysis_subject']['url']
             except:
                 self.debug_print("Exception in setting url")
-                # pass
 
     def _poll_task_status(self, task_id, action_result, task_start_time=None):
 
