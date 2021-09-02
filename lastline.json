@@ -57,6 +57,12 @@
             "data_type": "string",
             "order": 4,
             "description": "Push Account"
+        },
+        "report_url": {
+            "data_type": "string",
+            "order": 6,
+            "description": "Report URL for lastline service",
+            "default": "https://user.lastline.com"
         }
     },
     "actions": [
