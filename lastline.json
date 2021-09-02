@@ -5,7 +5,7 @@
     "type": "sandbox",
     "main_module": "lastline_connector.py",
     "app_version": "2.1.1",
-    "utctime_updated": "2021-08-31T23:09:12.000000Z",
+    "utctime_updated": "2021-09-02T23:09:12.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
     "product_name": "Lastline",
