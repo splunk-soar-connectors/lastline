@@ -47,8 +47,7 @@ class LastlineConnector(BaseConnector):
             config['api_token'], verify_ssl=config.get('verify_server_cert', True)
         )
         self._account_name = config.get('account_username')
-        self._report_url = config.get('report_url', 'https://user.lastline.com')
-        self._report_url = self._report_url if self._report_url[-1] != '/' else self._report_url[:-1]
+        self._report_url = config.get('report_url', 'https://user.lastline.com').rstrip('/')
         self.RESULTS_URL_TEMPLATE = self._report_url + '/portal#/analyst/task/{}'
 
         return phantom.APP_SUCCESS
