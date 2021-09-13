@@ -19,8 +19,6 @@ from datetime import datetime
 import time
 import hashlib
 
-RESULTS_URL_TEMPLATE = 'https://user.lastline.com/malscape/#/task/{}'
-
 
 class LastlineConnector(BaseConnector):
 
@@ -29,6 +27,9 @@ class LastlineConnector(BaseConnector):
     ACTION_ID_QUERY_URL = "detonate url"
     ACTION_ID_SANDBOX_RESULTS = "get report"
 
+    IsURLDetonation = 0
+    RESULTS_URL_TEMPLATE = None
+
     def __init__(self):
 
         # Call the BaseConnectors init first
@@ -36,6 +37,7 @@ class LastlineConnector(BaseConnector):
 
         self._client = None
         self._account_name = None
+        self._report_url = None
 
     def initialize(self):
 
@@ -45,6 +47,8 @@ class LastlineConnector(BaseConnector):
             config['api_token'], verify_ssl=config.get('verify_server_cert', True)
         )
         self._account_name = config.get('account_username')
+        self._report_url = config.get('report_url', 'https://user.lastline.com').rstrip('/')
+        self.RESULTS_URL_TEMPLATE = self._report_url + '/portal#/analyst/task/{}'
 
         return phantom.APP_SUCCESS
 
@@ -60,7 +64,7 @@ class LastlineConnector(BaseConnector):
             score = response['data']['score']
         except:
             pass
-        if score:
+        if score is not None:
             report['score'] = score
 
         md5 = None
@@ -118,6 +122,12 @@ class LastlineConnector(BaseConnector):
         if threat_class:
             report['threat_class'] = threat_class
 
+        if self.IsURLDetonation:
+            try:
+                report[ANALYSIS_KEY]['subject']['url'] = response['data']['analysis_subject']['url']
+            except:
+                self.debug_print("Exception in setting url")
+
     def _poll_task_status(self, task_id, action_result, task_start_time=None):
 
         if not task_start_time:
@@ -171,30 +181,31 @@ class LastlineConnector(BaseConnector):
         # unfortunately in case 'get result' we don't know what type of detonation it was
 
         # if url is present return that
-        try:
-            return "url", report[ANALYSIS_KEY]['subject']['url']
-        except:
-            pass
+        if self.IsURLDetonation:
+            try:
+                return "url", report[ANALYSIS_KEY]['subject']['url']
+            except:
+                return "url", 'Unknown'
 
-        # it's a file detonation, so need to get in roundabout way
-        try:
-            entry = report[ANALYSIS_SUBJECT_KEY][0]
-            subj_id = entry.get('overview', {}).get('process', {}).get('analysis_subject_id')
-            this_id = entry.get('overview', {}).get('id')
-            if subj_id == this_id:
-                target = entry.get('process', {}).get('executable', {}).get('static_pe_information', {}).get('original_filename')
-                if not target:
-                    target = entry.get('overview', {}).get('process', {}).get('executable', {}).get('filename', '').split('\\')[-1]
-        except Exception as e:
-            self.debug_print("Handled Exception: ", e)
-
-        return 'file', 'Unknown'
+        else:
+            # it's a file detonation, so need to get in roundabout way
+            try:
+                entry = report[ANALYSIS_SUBJECT_KEY][0]
+                subj_id = entry.get('overview', {}).get('process', {}).get('analysis_subject_id')
+                this_id = entry.get('overview', {}).get('id')
+                if subj_id == this_id:
+                    target = entry.get('process', {}).get('executable', {}).get('static_pe_information', {}).get('original_filename')
+                    if not target:
+                        target = entry.get('overview', {}).get('process', {}).get('executable', {}).get('filename', '').split('\\')[-1]
+            except Exception as e:
+                self.debug_print("Handled File Exception: ", e)
+            return 'file', 'Unknown'
 
     def _update_report_summary(self, report, action_result, task_id):
 
         action_result.add_data({RESULT_REPORT_KEY: report})
 
-        result_url = RESULTS_URL_TEMPLATE.format(task_id)
+        result_url = self.RESULTS_URL_TEMPLATE.format(task_id)
 
         analysis_type, target = self._get_target(report)
 
@@ -231,7 +242,7 @@ class LastlineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(param))
 
         task_id = param[TASK_ID_KEY]
-        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id)})
+        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: self.RESULTS_URL_TEMPLATE.format(task_id)})
 
         return self._poll_task_parse_report(task_id, action_result)
 
@@ -277,7 +288,7 @@ class LastlineConnector(BaseConnector):
         return phantom.APP_ERROR, None, None
 
     def _query_url(self, param):
-
+        self.IsURLDetonation = 1
         action_result = self.add_action_result(ActionResult(param))
 
         task_start_time = datetime.utcnow()
@@ -292,7 +303,7 @@ class LastlineConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
+        action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: self.RESULTS_URL_TEMPLATE.format(task_id),
                                       TARGET_KEY: param['url'], SUMMARY_TYPE_KEY: ANALYSIS_TYPE_URL})
 
         if not report:
@@ -364,7 +375,7 @@ class LastlineConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_TASK_ID_NOT_FOUND)
 
-        summary = {TASK_ID_KEY: task_id, RESULTS_URL_KEY: RESULTS_URL_TEMPLATE.format(task_id),
+        summary = {TASK_ID_KEY: task_id, RESULTS_URL_KEY: self.RESULTS_URL_TEMPLATE.format(task_id),
                    SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE, TARGET_KEY: vault_id}
 
         action_result.update_summary(summary)

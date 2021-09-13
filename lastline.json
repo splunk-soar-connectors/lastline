@@ -4,8 +4,8 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.py",
-    "app_version": "2.0.2",
-    "utctime_updated": "2021-08-06T00:25:51.000000Z",
+    "app_version": "2.1.2",
+    "utctime_updated": "2021-09-09T20:41:52.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
     "product_name": "Lastline",
@@ -57,13 +57,19 @@
             "data_type": "string",
             "order": 4,
             "description": "Push Account"
+        },
+        "report_url": {
+            "data_type": "string",
+            "order": 6,
+            "description": "Report URL for lastline service",
+            "default": "https://user.lastline.com"
         }
     },
     "actions": [
         {
             "action": "detonate file",
             "description": "Run the file in the Lastline sandbox and retrieve the analysis results",
-            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter.",
+            "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter. <br/> This action supports PE, PDF, doc, etc. for analysis.",
             "type": "investigate",
             "identifier": "detonate file",
             "read_only": true,
@@ -1538,7 +1544,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -1865,7 +1871,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -2238,7 +2244,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/malscape/#/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
