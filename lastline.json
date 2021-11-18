@@ -4,13 +4,13 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.py",
-    "app_version": "2.1.11",
-    "utctime_updated": "2021-10-13T07:55:53.000000Z",
+    "app_version": "2.2.0",
+    "utctime_updated": "2021-09-17T09:47:29.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
     "product_name": "Lastline",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "publisher": "Splunk",
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
@@ -18,7 +18,7 @@
     "license": "Copyright (c) 2015-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud, Version 2021.5 on August 01, 2021"
+        "Cloud, Version 2021.5 on October 04, 2021"
     ],
     "configuration": {
         "base_url": {

@@ -66,19 +66,19 @@ class LastlineConnector(BaseConnector):
         if score is not None:
             report['score'] = score
 
-        md5 = None
+        sha1 = None
         try:
-            md5 = response['data']['tasks'][0]['file_md5']
+            sha1 = response['data']['tasks'][0]['file_sha1']
         except:
             pass
 
         try:
-            md5 = response['data']['analysis_subject']['md5']
+            sha1 = response['data']['analysis_subject']['sha1']
         except:
             pass
 
-        if md5:
-            report['md5'] = md5
+        if sha1:
+            report['sha1'] = sha1
 
         mime_type = None
 
@@ -336,7 +336,7 @@ class LastlineConnector(BaseConnector):
 
         # First try to query the file as is, without uploading, if lastline has results for it
         try:
-            response = self._client.query_file_hash(sha1=vault_id)
+            response = self._client.query_file_hash(sha256=vault_id)
         except Exception as e:
             self.debug_print("Exception on query_file {0}".format(str(e)))
             return action_result.set_status(phantom.APP_ERROR, "Error Querying file hash", e)
@@ -398,12 +398,12 @@ class LastlineConnector(BaseConnector):
             self.save_progress(LASTLINE_ERR_CONNECTIVITY_TEST)
             return (self.set_status(phantom.APP_ERROR,
                                     "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
-        md5_hash = hashlib.md5(random_string.encode()).hexdigest()
+        sha256_hash = hashlib.sha256(random_string.encode('utf-8')).hexdigest()
 
-        self.save_progress(LASTLINE_GENERATED_RANDOM_HASH, gen_hash=md5_hash)
+        self.save_progress(LASTLINE_GENERATED_RANDOM_HASH, gen_hash=sha256_hash)
 
         try:
-            self._client.query_file_hash(md5=md5_hash)
+            self._client.query_file_hash(sha256=sha256_hash)
         except Exception as e:
             self.save_progress(str(e))
             return self.set_status(phantom.APP_ERROR, LASTLINE_ERR_CONNECTIVITY_TEST)
