@@ -56,7 +56,7 @@ To start the shell, invoke::
 replacing API_KEY and API_TOKEN with your API credentials.
 
 By default, the client connects to an API instance running in the Lastline cloud
-at https://analysis.lastline.com . To connect to a different instance, for 
+at https://analysis.lastline.com . To connect to a different instance, for
 example when using a Lastline On-Premise installation, please use the
 *--api-url* parameter to point to the URL of the On-Premise API. For example, to
 connect to a Lastline Analyst On-Premise running at *analyst.lastline.local*,
@@ -332,11 +332,11 @@ def purge_none(d):
 def parse_datetime(d):
     """
     Parse a datetime as formatted in one of the following formats:
-    
+
     date: %Y-%m-%d'
     datetime: '%Y-%m-%d %H:%M:%S'
     datetime with microseconds: '%Y-%m-%d %H:%M:%S.%f'
-    
+
     Can also handle a datetime.date or datetime.datetime object,
     (or anything that has year, month and day attributes)
     and converts it to datetime.datetime
@@ -365,15 +365,15 @@ def parse_datetime(d):
 class TaskCompletion(object):
     """
     Helper class to get score for all completed tasks
-    
+
     :param analysis_client: analysis_apiclient.AnalysisClientBase
-    
+
     Sample usage:
-    
+
     tc = TaskCompletion(my_analysis_client)
     for completed_task in tc.get_completed(start,end):
         print completed_task.task_uuid, completed_task.score
-    
+
     """
 
     def __init__(self, analysis_client):
@@ -382,15 +382,15 @@ class TaskCompletion(object):
     def get_completed(self, after, before):
         """
         Return scores of tasks completed in the specified time range.
-        
+
         This takes care of using the analysis API's pagination
         to make sure it gets all tasks.
-        
+
         :param after: datetime.datetime
         :param before: datetime.datetime
-        
+
         :yield: sequence of `CompletedTask`
-        
+
         :raise: InvalidAnalysisAPIResponse if response
             does not have the format we expect
         """
@@ -1298,31 +1298,42 @@ class AnalysisClientBase(object):
         return self._api_request(url, params, raw=raw, post=True)
 
     def query_file_hash(self, hash_value=None, algorithm=None, block_size=None,
-                        md5=None, sha1=None, mmh3=None, raw=False):
+                        md5=None, sha1=None, sha256=None, mmh3=None, raw=False):
         """
         Search for existing analysis results with the given file-hash.
 
         :param hash_value: The (partial) file-hash.
-        :param algorithm: One of MD5/SHA1/MMH3
+        :param algorithm: One of MD5/SHA1/SHA256
         :param block_size: Size of the block (at file start) used for generating
             the hash-value. By default (or if 0), the entire file is assumed.
         :param md5: Helper to quickly set `hash_value` and `algorithm`
         :param sha1: Helper to quickly set `hash_value` and `algorithm`
-        :param mmh3: Helper to quickly set `hash_value` and `algorithm`
+        :param sha256: Helper to quickly set `hash_value` and `algorithm`
+        :param mmh3: DEPRECATED! Don't use, mmh3 file hash is no longer supported
         :param raw: if True, return the raw JSON/XML results of the API query.
         :param requested_format: JSON or XML. If format is not JSON, this
             implies `raw`.
+        :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
+        :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        if md5 or sha1 or mmh3:
+        if (mmh3 or (algorithm and algorithm.lower() == 'mmh3')) and self.__logger:
+            self.__logger.warning(
+                "No results will be returned for deprecated mmh3 file-hash query"
+            )
+
+        if md5 or sha1 or sha256 or mmh3:
             if hash_value or algorithm:
                 raise TypeError("Conflicting values passed for hash/algorithm")
-            if md5 and not sha1 and not mmh3:
+            if md5 and not sha1 and not sha256 and not mmh3:
                 hash_value = md5
                 algorithm = 'md5'
-            elif sha1 and not md5 and not mmh3:
+            elif sha1 and not md5 and not sha256 and not mmh3:
                 hash_value = sha1
                 algorithm = 'sha1'
-            elif mmh3 and not md5 and not sha1:
+            elif sha256 and not md5 and not sha1 and not mmh3:
+                hash_value = sha256
+                algorithm = 'sha256'
+            elif mmh3 and not md5 and not sha1 and not sha256:
                 hash_value = mmh3
                 algorithm = 'mmh3'
             else:
@@ -1336,7 +1347,7 @@ class AnalysisClientBase(object):
             'hash_algorithm': algorithm,
             'hash_block_size': block_size,
         })
-        return self._api_request(url, params, raw=raw, post=True)
+        return self._api_request(url, params, raw=raw)
 
     def is_blocked_file_hash(self, hash_value=None, algorithm=None,
                              block_size=None, md5=None, sha1=None, mmh3=None,
