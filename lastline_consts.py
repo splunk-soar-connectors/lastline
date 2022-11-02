@@ -33,7 +33,6 @@ PHANTOM_ERROR_MESSAGE_UNAVAILABLE = "Unknown error occurred. Please check the as
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
 LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"
 LASTLINE_ERROR_CONNECTIVITY_TEST = "Test Connectivity Failed"
-LASTLINE_ERROR_CONNECT = "Error occurred, response: {response}"
 LASTLINE_ERROR_GETTING_REPORT = "Error getting report"
 LASTLINE_ERROR_SUBMIT_URL = "Error submitting URL"
 LASTLINE_ERROR_TASK_ID_NOT_FOUND = "Task ID not found"
