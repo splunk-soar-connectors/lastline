@@ -4,7 +4,7 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.py",
-    "app_version": "2.2.4",
+    "app_version": "3.0.0",
     "utctime_updated": "2022-01-07T21:25:08.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
@@ -16,11 +16,8 @@
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) 2015-2021 Splunk Inc.",
+    "license": "Copyright (c) 2015-2022 Splunk Inc.",
     "python_version": "3",
-    "latest_tested_versions": [
-        "Cloud, Version 2021.5 on October 04, 2021"
-    ],
     "configuration": {
         "base_url": {
             "data_type": "string",
@@ -2287,23 +2284,23 @@
         "wheel": [
             {
                 "module": "certifi",
-                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
             },
             {
                 "module": "chardet",
-                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
             },
             {
                 "module": "idna",
-                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
-                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     }

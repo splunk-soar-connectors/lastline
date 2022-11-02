@@ -1,6 +1,6 @@
 # File: lastline_connector.py
 #
-# Copyright (c) 2015-2021 Splunk Inc.
+# Copyright (c) 2015-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +15,17 @@
 #
 #
 # Phantom imports
-import phantom.app as phantom
-from phantom.app import BaseConnector
-from phantom.app import ActionResult
-import phantom.rules as phrules
-
-from llmodule.analysis_apiclient import AnalysisClient, AnalysisAPIError, ANALYSIS_API_NO_RESULT_FOUND
-from lastline_consts import *
-
+import hashlib
+import time
 # Other imports used by this connector
 from datetime import datetime
-import time
-import hashlib
+
+import phantom.app as phantom
+import phantom.rules as phrules
+from phantom.app import ActionResult, BaseConnector
+
+from lastline_consts import *
+from llmodule.analysis_apiclient import ANALYSIS_API_NO_RESULT_FOUND, AnalysisAPIError, AnalysisClient
 
 
 class LastlineConnector(BaseConnector):
@@ -445,8 +444,8 @@ class LastlineConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     import json
+    import sys
 
     import pudb
 
