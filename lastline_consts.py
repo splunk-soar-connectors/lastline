@@ -27,16 +27,12 @@ ANALYSIS_SUBJECT_KEY = 'analysis_subjects'
 VAULT_ERROR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERROR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
 
-PHANTOM_ERROR_CODE_UNAVAILABLE = "Error code unavailable"
-PHANTOM_ERROR_MESSAGE_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters"
-
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
 LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"
 LASTLINE_ERROR_CONNECTIVITY_TEST = "Test Connectivity Failed"
 LASTLINE_ERROR_GETTING_REPORT = "Error getting report"
 LASTLINE_ERROR_SUBMIT_URL = "Error submitting URL"
 LASTLINE_ERROR_TASK_ID_NOT_FOUND = "Task ID not found"
-LASTLINE_ERROR_NO_FILES = "No runnable files found"
 
 LASTLINE_SLEEP_SECS = 10
 LASTLINE_JSON_POLL_TIMEOUT_SECS = "timeout"
