@@ -10,8 +10,8 @@
     "product_vendor": "Lastline",
     "product_name": "Lastline",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.10.0.40961",
-    "publisher": "Splunk",
+    "min_phantom_version": "5.3.4",
+    "publisher": "Splunk Community",
     "fips_compliant": true,
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
@@ -69,7 +69,7 @@
             "description": "Run the file in the Lastline sandbox and retrieve the analysis results",
             "verbose": "This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter. <br/> This action supports PE, PDF, doc, etc. for analysis.",
             "type": "investigate",
-            "identifier": "detonate file",
+            "identifier": "query_file",
             "read_only": true,
             "lock": {
                 "enabled": false
@@ -1573,7 +1573,7 @@
             "action": "get report",
             "description": "Query for results of an already completed task in Lastline",
             "type": "investigate",
-            "identifier": "get report",
+            "identifier": "get_detonation_result",
             "read_only": true,
             "lock": {
                 "enabled": false
@@ -1900,7 +1900,7 @@
             "action": "detonate url",
             "description": "Load a URL in the Lastline sandbox and retrieve the analysis results",
             "type": "investigate",
-            "identifier": "detonate url",
+            "identifier": "query_url",
             "read_only": true,
             "lock": {
                 "enabled": false

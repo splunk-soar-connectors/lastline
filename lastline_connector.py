@@ -31,9 +31,9 @@ from llmodule.analysis_apiclient import ANALYSIS_API_NO_RESULT_FOUND, AnalysisAP
 class LastlineConnector(BaseConnector):
 
     # The actions supported by this connector
-    ACTION_ID_QUERY_FILE = "detonate file"
-    ACTION_ID_QUERY_URL = "detonate url"
-    ACTION_ID_SANDBOX_RESULTS = "get report"
+    ACTION_ID_QUERY_FILE = "query_file"
+    ACTION_ID_QUERY_URL = "query_url"
+    ACTION_ID_SANDBOX_RESULTS = "get_detonation_result"
 
     def __init__(self):
 
@@ -167,10 +167,10 @@ class LastlineConnector(BaseConnector):
                 self.debug_print("Got AnalysisAPIError exception:", str(e))
                 no_result_found = bool(e.error_code == ANALYSIS_API_NO_RESULT_FOUND)
                 if not no_result_found:
-                    return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None
+                    return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERROR_GETTING_REPORT, e), None
             except Exception as e:
                 self.debug_print("Got Exception: ", e)
-                return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_GETTING_REPORT, e), None
+                return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERROR_GETTING_REPORT, e), None
 
             if report:
                 self._update_report(response, report)
@@ -247,6 +247,7 @@ class LastlineConnector(BaseConnector):
     def _get_detonation_result(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         task_id = param[TASK_ID_KEY]
         action_result.update_summary({TASK_ID_KEY: task_id, RESULTS_URL_KEY: self._results_url_template.format(task_id)})
@@ -297,13 +298,14 @@ class LastlineConnector(BaseConnector):
     def _query_url(self, param):
         self._is_url_detonation = 1
         action_result = self.add_action_result(ActionResult(param))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         task_start_time = datetime.utcnow()
 
         try:
             response = self._client.submit_url(param['url'], push_to_portal_account=self._account_name)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_SUBMIT_URL, e)
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERROR_SUBMIT_URL, e)
 
         ret_val, task_id, report = self._get_task_id(response, action_result)
 
@@ -325,15 +327,16 @@ class LastlineConnector(BaseConnector):
             success, message, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = list(vault_info)[0]
         except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERROR_FILE_NOT_FOUND), None
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_INVALID_VAULT_ID), None
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERROR_INVALID_VAULT_ID), None
 
         return phantom.APP_SUCCESS, vault_info
 
     def _query_file(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         vault_id = param['vault_id']
         filename = param.get('file_name')
@@ -380,7 +383,7 @@ class LastlineConnector(BaseConnector):
         ret_val, task_id, report = self._get_task_id(response, action_result)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERR_TASK_ID_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_ERROR_TASK_ID_NOT_FOUND)
 
         summary = {TASK_ID_KEY: task_id, RESULTS_URL_KEY: self._results_url_template.format(task_id),
                    SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE, TARGET_KEY: vault_id}
@@ -403,7 +406,7 @@ class LastlineConnector(BaseConnector):
         timeout = int(config.get(LASTLINE_JSON_POLL_TIMEOUT_SECS, LASTLINE_MAX_TIMEOUT_DEF_SECS))
 
         if timeout < LASTLINE_SLEEP_SECS:
-            self.save_progress(LASTLINE_ERR_CONNECTIVITY_TEST)
+            self.save_progress(LASTLINE_ERROR_CONNECTIVITY_TEST)
             return (self.set_status(phantom.APP_ERROR,
                                     "Please specify timeout greater than {0}".format(LASTLINE_SLEEP_SECS)), None)
         sha256_hash = hashlib.sha256(random_string.encode('utf-8')).hexdigest()
@@ -414,7 +417,7 @@ class LastlineConnector(BaseConnector):
             self._client.query_file_hash(sha256=sha256_hash)
         except Exception as e:
             self.save_progress(str(e))
-            return self.set_status(phantom.APP_ERROR, LASTLINE_ERR_CONNECTIVITY_TEST)
+            return self.set_status(phantom.APP_ERROR, LASTLINE_ERROR_CONNECTIVITY_TEST)
 
         self.save_progress(LASTLINE_SUCC_CONNECTIVITY_TEST)
         return self.set_status(phantom.APP_SUCCESS)
@@ -463,4 +466,4 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)
