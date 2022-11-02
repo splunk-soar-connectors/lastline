@@ -1,12 +1,12 @@
 [comment]: # "Auto-generated SOAR connector documentation"
 # Lastline
 
-Publisher: Splunk  
-Connector Version: 2\.2\.3  
+Publisher: Splunk Community  
+Connector Version: 3\.0\.0  
 Product Vendor: Lastline  
 Product Name: Lastline  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.10\.0\.40961  
+Minimum Product Version: 5\.3\.5  
 
 This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox
 
