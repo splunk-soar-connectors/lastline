@@ -28,10 +28,10 @@ VAULT_ERROR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERROR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
 
 PHANTOM_ERROR_CODE_UNAVAILABLE = "Error code unavailable"
-PHANTOM_ERROR_MSG_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters"
+PHANTOM_ERROR_MESSAGE_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters"
 
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
-LASTLINE_SUCC_CONNECTIVITY_TEST = "Test Connectivity Passed"
+LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"
 LASTLINE_ERROR_CONNECTIVITY_TEST = "Test Connectivity Failed"
 LASTLINE_ERROR_CONNECT = "Error occurred, response: {response}"
 LASTLINE_ERROR_GETTING_REPORT = "Error getting report"

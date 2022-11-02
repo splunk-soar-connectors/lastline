@@ -419,7 +419,7 @@ class LastlineConnector(BaseConnector):
             self.save_progress(str(e))
             return self.set_status(phantom.APP_ERROR, LASTLINE_ERROR_CONNECTIVITY_TEST)
 
-        self.save_progress(LASTLINE_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(LASTLINE_SUCCESS_CONNECTIVITY_TEST)
         return self.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
