@@ -457,7 +457,7 @@ class LastlineConnector(BaseConnector):
                 self.save_progress(error_message)
                 action_result.add_data({'error': error_message})
                 return action_result.set_status(phantom.APP_ERROR, error_message)
-         
+
         self.save_progress(f"Downloading the following artifacts: {json.dumps(artifact_names)}")
         summary = {
             TASK_ID_KEY: task_id,
