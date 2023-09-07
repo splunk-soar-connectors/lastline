@@ -2278,6 +2278,226 @@
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "get artifact",
+            "identifier": "get_artifact",
+            "description": "Download Lastline generated artifact and store to SOAR/Phantom Vault",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Task ID to get the results of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "id",
+                    "id": 1,
+                    "param_name": "id"
+                },
+                "artifact_name": {
+                    "description": "Name of the Artifact (when not specified all artifacts will be stored)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "artifact_name",
+                    "id": 2,
+                    "param_name": "artifact_name",
+                    "descriptionError": false
+                },
+                "password": {
+                    "description": "Optional for artifact encryption",
+                    "data_type": "password",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2,
+                    "name": "password",
+                    "id": 3,
+                    "param_name": "password"
+                },
+                "container_id": {
+                    "description": "Optional container id for artifact storage (Is detected automatically)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3,
+                    "name": "container_id",
+                    "id": 4,
+                    "param_name": "container_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_name",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "artifact_name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "password",
+                    "contains": [],
+                    "column_name": "password",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "container_id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "numeric",
+                    "example_value": [
+                        122
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata_type",
+                    "data_type": "string",
+                    "example_value": [
+                        "screenshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_value": [
+                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retention_date",
+                    "data_type": "string",
+                    "example_value": [
+                        "2023-12-05 13:39:31.000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_file",
+                    "data_type": "string",
+                    "example_value": [
+                        "putty.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.succeeded",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_value": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_value": [
+                        "d3d9a847064436052305646d97a5317277e40ebf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_value": [
+                        "d3d9a847064436052305646d97a5317277e40ebf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
+                    "example_value": [
+                        "automation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task_id",
+                    "data_type": "string",
+                    "example_value": [
+                        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_name",
+                    "data_type": "string",
+                    "example_value": [
+                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_state",
+                    "data_type": "string",
+                    "example_value": [
+                        "stored",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 20,
+                "height": 10,
+                "view": "lastline_view.display_artifacts",
+                "title": "Lastline Artifacts"
+            },
+            "versions": "EQ(*)"
         }
     ],
     "pip_dependencies": {

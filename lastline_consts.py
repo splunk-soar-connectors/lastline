@@ -26,6 +26,9 @@ ANALYSIS_SUBJECT_KEY = 'analysis_subjects'
 
 VAULT_ERROR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERROR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
+VAULT_ARTIFACTS_TOTAL_KEY = 'artifacts_total'
+VAULT_ARTIFACTS_STORED_KEY = 'artifacts_stored'
+VAULT_ARTIFACTS_FAILED_KEY = 'artifacts_failed'
 
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
 LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"

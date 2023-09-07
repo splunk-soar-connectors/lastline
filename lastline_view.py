@@ -12,6 +12,16 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
+def mask_string(url):
+    return url.lower() \
+           .replace('http', 'hXXp') \
+           .replace('/', '[/]') \
+           .replace(':[/][/]', '[://]') \
+           .replace('.', '[.]') \
+           .replace('?', '[?]') \
+           .replace('=', '[=]') \
+           .replace('&', '[&]')
+
 def parse_report(report):
     # pre-process the report here if required
 
@@ -94,3 +104,20 @@ def display_report(provides, all_app_runs, context):
             results.append(ctx_result)
     # print context
     return 'll_display_report.html'
+
+def display_artifacts(provides, all_app_runs, context):
+    context['results'] = results = []
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+            for data in result.get_data():
+                if 'url' in data:
+                    data['masked_url'] = mask_string(data['url'])
+                if 'file' in data:
+                    data['masked_file'] = v(data['source_file'])
+                results.append({
+                    'param': result.get_param(),
+                    'data': data,
+                    'summary': result.get_summary()
+                })
+            
+    return 'll_display_artifacts.html'
