@@ -115,7 +115,7 @@ def display_artifacts(provides, all_app_runs, context):
                 if 'url' in data:
                     data['masked_url'] = mask_string(data['url'])
                 if 'file' in data:
-                    data['masked_file'] = v(data['source_file'])
+                    data['masked_file'] = mask_string(data['source_file'])
                 results.append({
                     'param': result.get_param(),
                     'data': data,
