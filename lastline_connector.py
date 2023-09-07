@@ -426,10 +426,10 @@ class LastlineConnector(BaseConnector):
         return self.set_status(phantom.APP_SUCCESS)
 
     def _get_artifact(self, param):
-        
+
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        
+
         task_id = param['id']
         artifact_name = param.get('artifact_name', None)
         artifact_password = param.get('password', None)
@@ -440,15 +440,15 @@ class LastlineConnector(BaseConnector):
         # Get Report
         ret_val, report = self._poll_task_status(task_id, action_result, task_start_time=None)
         if phantom.is_fail(ret_val):
-                return action_result.get_status()
+            return action_result.get_status()
         if not report:
-                return action_result.set_status(phantom.APP_ERROR, LASTLINE_POLL_TIMEOUT.format(task_id))
-        
-        if not 'analysis_metadata' in report or not isinstance(report['analysis_metadata'], list):
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_POLL_TIMEOUT.format(task_id))
+
+        if 'analysis_metadata' not in report or not isinstance(report['analysis_metadata'], list):
             return action_result.set_status(phantom.APP_ERROR, "No analysis metadata in report")
-        
+
         artifact_names = [artifact['name'] for artifact in report['analysis_metadata']]
-        
+
         if artifact_name:
             if artifact_name in artifact_names:
                 artifact_names = [artifact_name]
@@ -457,7 +457,7 @@ class LastlineConnector(BaseConnector):
                 self.save_progress(error_message)
                 action_result.add_data({'error': error_message})
                 return action_result.set_status(phantom.APP_ERROR, error_message)
-                          
+         
         self.save_progress(f"Downloading the following artifacts: {json.dumps(artifact_names)}")
         summary = {
             TASK_ID_KEY: task_id,
@@ -467,13 +467,13 @@ class LastlineConnector(BaseConnector):
             VAULT_ARTIFACTS_FAILED_KEY: 0,
             VAULT_ARTIFACTS_TOTAL_KEY: 0
         }
-        
+
         downloaded_files = set()
         for artifact in report['analysis_metadata']:
             file_name = artifact['name']
             if file_name not in artifact_names or file_name in downloaded_files:
                 continue
-            
+
             downloaded_files.add(file_name)
             summary[VAULT_ARTIFACTS_TOTAL_KEY] = summary[VAULT_ARTIFACTS_TOTAL_KEY] + 1
             artifact_result = self._client.get_report_artifact(task_id, report['uuid'], file_name, artifact_password)
@@ -490,7 +490,7 @@ class LastlineConnector(BaseConnector):
                     report_subject = source_file
             except:
                 pass
-            
+
             file_name = f"{report_subject}_{task_id}_{self.get_app_run_id()}_{file_name}"
             vault_response = Vault.create_attachment(artifact_value, container_id, file_name=file_name)
             artifact.update(vault_response)
@@ -505,9 +505,9 @@ class LastlineConnector(BaseConnector):
                 summary[VAULT_ARTIFACTS_FAILED_KEY] = summary[VAULT_ARTIFACTS_FAILED_KEY] + 1
                 artifact['vault_state'] = 'error'
             action_result.add_data(artifact)
-            
+
         action_result.update_summary(summary)
-            
+
         if summary[VAULT_ARTIFACTS_STORED_KEY] == summary[VAULT_ARTIFACTS_TOTAL_KEY]:
             return action_result.set_status(phantom.APP_SUCCESS, "All artifacts stored successfully")
         else:
@@ -540,7 +540,6 @@ class LastlineConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import json
     import sys
 
     import pudb

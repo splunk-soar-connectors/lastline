@@ -22,6 +22,7 @@ def mask_string(url):
            .replace('=', '[=]') \
            .replace('&', '[&]')
 
+
 def parse_report(report):
     # pre-process the report here if required
 
@@ -105,6 +106,7 @@ def display_report(provides, all_app_runs, context):
     # print context
     return 'll_display_report.html'
 
+
 def display_artifacts(provides, all_app_runs, context):
     context['results'] = results = []
     for summary, action_results in all_app_runs:
@@ -119,5 +121,5 @@ def display_artifacts(provides, all_app_runs, context):
                     'data': data,
                     'summary': result.get_summary()
                 })
-            
+
     return 'll_display_artifacts.html'
