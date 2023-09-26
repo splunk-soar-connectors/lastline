@@ -1,6 +1,6 @@
 # File: analysis_apiclient.py
 #
-# Copyright (c) 2015-2021 Splunk Inc.
+# Copyright (c) 2015-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,10 +73,14 @@ API, and it can be used to experiment with the API for analyzing files or URLs. 
 refer to the :ref:`API Client Shell documentation <analysis_client_shell>`.
 """
 from __future__ import print_function
+
 from builtins import object  # pylint: disable=redefined-builtin
+
 from future import standard_library
+
 standard_library.install_aliases()
 from future import utils as future_utils
+
 try:
     # python-future tries to use the backported configparser module that it provides.
     # However, existing libraries that pass ConfigParser objects to this module have compatibility
@@ -87,6 +91,7 @@ try:
     import ConfigParser as configparser
 except ImportError:
     import configparser
+
 import cgi
 import collections
 import datetime
@@ -95,15 +100,15 @@ import http.client
 import io
 import logging
 import os
-import requests
-import simplejson
 import ssl
 import sys
 import time
 
+import requests
+import simplejson
+
 try:
-    from llapi_client import get_proxies_from_config
-    from llapi_client import llpcap_apiclient
+    from llapi_client import get_proxies_from_config, llpcap_apiclient
 except ImportError:
     # Non-Lastline environment. Reading from config not support/needed.
     get_proxies_from_config = None
@@ -5018,6 +5023,7 @@ class AnalyzeHelper(object):
         return True
 
 
+import optparse
 #############################################################################
 #
 # END API-CLIENT FUNCTIONALITY
@@ -5026,7 +5032,6 @@ class AnalyzeHelper(object):
 #
 # NOTE: We only keep this code in this module for backwards-compatibility
 import sys
-import optparse
 
 
 def init_shell(banner):
@@ -5039,6 +5044,7 @@ def init_shell(banner):
         shell = embed.InteractiveShellEmbed(banner1=banner)
     except ImportError: # iPython < 0.11
         import IPython
+
         # pylint: disable=E1101
         # pylint won't find the class if a newer version is installed
         shell = IPython.Shell.IPShellEmbed()

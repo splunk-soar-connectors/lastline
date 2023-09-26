@@ -1,6 +1,6 @@
 # File: lastline_connector.py
 #
-# Copyright (c) 2015-2022 Splunk Inc.
+# Copyright (c) 2015-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,18 +16,20 @@
 #
 # Phantom imports
 import hashlib
+import json
+import sys
 import time
 # Other imports used by this connector
 from datetime import datetime
 
 import phantom.app as phantom
 import phantom.rules as phrules
+import requests
 from phantom.app import ActionResult, BaseConnector
 from phantom.vault import Vault as Vault
 
 from lastline_consts import *
 from llmodule.analysis_apiclient import ANALYSIS_API_NO_RESULT_FOUND, AnalysisAPIError, AnalysisClient
-import json
 
 
 class LastlineConnector(BaseConnector):
@@ -523,6 +525,7 @@ class LastlineConnector(BaseConnector):
         """
 
         action = self.get_action_identifier()
+        result = phantom.APP_SUCCESS
 
         if action == self.ACTION_ID_QUERY_FILE:
             result = self._query_file(param)
@@ -539,23 +542,66 @@ class LastlineConnector(BaseConnector):
 
 
 if __name__ == '__main__':
+    import argparse
 
-    import sys
+    argparser = argparse.ArgumentParser()
 
-    import pudb
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
-    pudb.set_trace()
+    args = argparser.parse_args()
+    session_id = None
 
-    with open(sys.argv[1]) as f:
+    username = args.username
+    password = args.password
+    verify = args.verify
 
+    if username is not None and password is None:
+        # User specified a username but not a password, so ask
+        import getpass
+
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        try:
+            login_url = LastlineConnector._get_phantom_base_url() + '/login'
+
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=verify, timeout=LASTLINE_DEFAULT_TIMEOUT)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=verify, timeout=LASTLINE_DEFAULT_TIMEOUT,
+                               data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            sys.exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
-
         in_json = json.loads(in_json)
-
         print(json.dumps(in_json, indent=4))
 
         connector = LastlineConnector()
+        connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print(ret_val)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     sys.exit(0)

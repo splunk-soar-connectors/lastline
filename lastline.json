@@ -12,11 +12,11 @@
     "product_version_regex": ".*",
     "min_phantom_version": "5.3.5",
     "publisher": "Splunk Community",
-    "fips_compliant": true,
+    "fips_compliant": false,
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) 2015-2022 Splunk Inc.",
+    "license": "Copyright (c) 2015-2023 Splunk Inc.",
     "python_version": "3",
     "configuration": {
         "base_url": {
@@ -37,7 +37,7 @@
             "order": 5,
             "description": "Timeout (seconds)",
             "required": true,
-            "defualt": 120
+            "default": 120
         },
         "license_key": {
             "data_type": "password",
@@ -2283,7 +2283,6 @@
             "action": "get artifact",
             "identifier": "get_artifact",
             "description": "Download Lastline generated artifact and store to SOAR/Phantom Vault",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -2291,82 +2290,46 @@
                     "description": "Task ID to get the results of",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0,
-                    "name": "id",
-                    "id": 1,
-                    "param_name": "id"
+                    "order": 0
                 },
                 "artifact_name": {
                     "description": "Name of the Artifact (when not specified all artifacts will be stored)",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 1,
-                    "name": "artifact_name",
-                    "id": 2,
-                    "param_name": "artifact_name",
-                    "descriptionError": false
+                    "order": 1
                 },
                 "password": {
                     "description": "Optional for artifact encryption",
                     "data_type": "password",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 2,
-                    "name": "password",
-                    "id": 3,
-                    "param_name": "password"
+                    "order": 2
                 },
                 "container_id": {
                     "description": "Optional container id for artifact storage (Is detected automatically)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 3,
-                    "name": "container_id",
-                    "id": 4,
-                    "param_name": "container_id"
+                    "order": 3
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.artifact_name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "artifact_name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.password",
                     "data_type": "password",
-                    "contains": [],
                     "column_name": "password",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.container_id",
                     "data_type": "numeric",
-                    "contains": [],
                     "column_name": "container_id",
                     "column_order": 3
                 },
@@ -2463,7 +2426,7 @@
                     "data_path": "action_result.data.*.task_id",
                     "data_type": "string",
                     "example_value": [
-                        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        "TEST00200223a837f000200223aEXAMPLE"
                     ]
                 },
                 {
@@ -2472,6 +2435,10 @@
                     "example_value": [
                         "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.vault_state",
@@ -2502,26 +2469,9 @@
     ],
     "pip_dependencies": {
         "wheel": [
-            {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
-            }
         ]
+    },
+    "pip39_dependencies": {
+        "wheel": []
     }
 }
