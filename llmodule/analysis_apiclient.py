@@ -74,12 +74,26 @@ refer to the :ref:`API Client Shell documentation <analysis_client_shell>`.
 """
 from __future__ import print_function
 
+import cgi
+import collections
+import datetime
+import hashlib
+import http.client
+import io
+import logging
+import optparse
+import os
+import ssl
+import sys
+import time
 from builtins import object  # pylint: disable=redefined-builtin
 
+import requests
+import simplejson
 from future import standard_library
+from future import utils as future_utils
 
 standard_library.install_aliases()
-from future import utils as future_utils
 
 try:
     # python-future tries to use the backported configparser module that it provides.
@@ -91,21 +105,6 @@ try:
     import ConfigParser as configparser
 except ImportError:
     import configparser
-
-import cgi
-import collections
-import datetime
-import hashlib
-import http.client
-import io
-import logging
-import os
-import ssl
-import sys
-import time
-
-import requests
-import simplejson
 
 try:
     from llapi_client import get_proxies_from_config, llpcap_apiclient
@@ -134,16 +133,16 @@ if __name__ == "__main__":
 # copied these values from Lastline utility code (llutils.api.error)
 # to make them available to users of client code. please keep in sync!
 ANALYSIS_API_FILE_NOT_AVAILABLE = 101
-ANALYSIS_API_UNKNOWN_RESOURCE_TYPE = 102 # undocumented
-ANALYSIS_API_UNKNOWN_ANALYSIS_TYPE = 103 # undocumented
+ANALYSIS_API_UNKNOWN_RESOURCE_TYPE = 102  # undocumented
+ANALYSIS_API_UNKNOWN_ANALYSIS_TYPE = 103  # undocumented
 ANALYSIS_API_INVALID_CREDENTIALS = 104
 ANALYSIS_API_INVALID_UUID = 105
 ANALYSIS_API_NO_RESULT_FOUND = 106
 ANALYSIS_API_TEMPORARILY_UNAVAILABLE = 107
 ANALYSIS_API_PERMISSION_DENIED = 108
 ANALYSIS_API_FILE_TOO_LARGE = 109
-ANALYSIS_API_INVALID_DOMAIN = 110 # undocumented
-ANALYSIS_API_INVALID_BACKEND = 111 # undocumented
+ANALYSIS_API_INVALID_DOMAIN = 110  # undocumented
+ANALYSIS_API_INVALID_BACKEND = 111  # undocumented
 ANALYSIS_API_INVALID_D_METADATA = 112
 ANALYSIS_API_INVALID_FILE_TYPE = 113
 ANALYSIS_API_INVALID_ARTIFACT_UUID = 114
@@ -170,6 +169,7 @@ ANALYSIS_API_EXPORT_REPORT_TYPES = (
 )
 ANALYSIS_API_EXPORT_FORMAT_PDF = 'PDF'
 ANALYSIS_API_EXPORT_REPORT_FORMATS = (ANALYSIS_API_EXPORT_FORMAT_PDF,)
+
 
 class Error(Exception):
     """
@@ -429,6 +429,7 @@ __COMPLETED_TASK_FIELDS = [
 CompletedTask = collections.namedtuple("CompletedTask", __COMPLETED_TASK_FIELDS)
 CompletedTask.__new__.__defaults__ = (None, None)
 
+
 def get_time():
     """
     trivial wrapper around time.time to make testing easier
@@ -461,7 +462,7 @@ def hash_stream(stream, algorithm):
     try:
         m = hashlib.new(algorithm)
     except ValueError:
-        #unsupported hash type
+        # unsupported hash type
         raise NotImplementedError("Hash function '%s' is not available" %
                                   algorithm)
 
@@ -489,13 +490,14 @@ def parse_datetime(d):
         return datetime.datetime(d.year, d.month, d.day)
 
     try:
-        return datetime.datetime.strptime(
-            d, AnalysisClientBase.DATETIME_MSEC_FMT)
-    except ValueError: pass
+        return datetime.datetime.strptime(d, AnalysisClientBase.DATETIME_MSEC_FMT)
+    except ValueError:
+        pass
 
     try:
         return datetime.datetime.strptime(d, AnalysisClientBase.DATETIME_FMT)
-    except ValueError: pass
+    except ValueError:
+        pass
 
     try:
         return datetime.datetime.strptime(d, AnalysisClientBase.DATE_FMT)
@@ -1077,7 +1079,6 @@ class AnalysisClientBase(object):
         """
         # this parameter was introduced into the LLAPI-client at some point, but
         # it's actually not supported by the API!
-        _unused = server_host
 
         if self.__logger and backend:
             self.__logger.warning("Ignoring deprecated parameter 'backend'")
@@ -1140,8 +1141,7 @@ class AnalysisClientBase(object):
             "download_agent": self._str_to_bytesio(download_agent),
             "download_referer": self._str_to_bytesio(download_referer),
             "download_request": self._str_to_bytesio(download_request),
-            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata))
-                if task_metadata is not None else None,
+            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
             # NOTE: We enforce that the given collection is a unique list (set cannot be
             # serialized). Further, if we are given an empty collection, we don't bother sending
             # the json
@@ -1334,7 +1334,6 @@ class AnalysisClientBase(object):
         """
         # this parameter was introduced into the LLAPI-client at some point, but
         # it's actually not supported by the API!
-        _unused = server_host
 
         if self.__logger and backend:
             self.__logger.warning("Ignoring deprecated parameter 'backend'")
@@ -1407,8 +1406,7 @@ class AnalysisClientBase(object):
             "download_agent": self._str_to_bytesio(download_agent),
             "download_referer": self._str_to_bytesio(download_referer),
             "download_request": self._str_to_bytesio(download_request),
-            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata))
-                if task_metadata is not None else None,
+            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
             # NOTE: We enforce that the given collection is a unique list (set cannot be
             # serialized). Further, if we are given an empty collection, we don't bother sending
             # the json
@@ -1466,8 +1464,8 @@ class AnalysisClientBase(object):
             "download_ip": download_ip,
             "download_port": download_port
         }
-        #using and-or-trick to convert to a StringIO if it is not None
-        #this just wraps it into a file-like object
+        # using and-or-trick to convert to a StringIO if it is not None
+        # this just wraps it into a file-like object
         files = {
             "download_host": self._str_to_bytesio(download_host),
             "download_path": self._str_to_bytesio(download_path),
@@ -2791,7 +2789,7 @@ class AnalysisClientBase(object):
         if mitre_technique_ids:
             params['mitre_technique_ids'] = ','.join(mitre_technique_ids)
         if mitre_tactic_ids:
-            params['mitre_tactic_ids'] =  ','.join(mitre_tactic_ids)
+            params['mitre_tactic_ids'] = ','.join(mitre_tactic_ids)
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def add_av_detection_score(
@@ -2837,7 +2835,6 @@ class AnalysisClientBase(object):
 
         if score is not None and not (0 <= score <= 100):
             raise Error("Invalid score value")
-
 
         params = purge_none({
             'av_product_name': av_product_name,
@@ -2930,8 +2927,8 @@ class AnalysisClientBase(object):
 
             return page
 
-        #why does pylint think result is a bool??
-        #pylint: disable=E1103
+        # why does pylint think result is a bool??
+        # pylint: disable=E1103
         result = simplejson.loads(page)
         success = result['success']
         if success:
@@ -3192,7 +3189,6 @@ class AnalysisClientBase(object):
 
         DEPRECATED. DO NOT USE
         """
-        unused = query_start, query_end, raw
         assert False, "Call to deprecated API function"
 
     def get_api_utc_timestamp(self):
@@ -3967,19 +3963,22 @@ class SubmissionHelper(object):
         file_pos = file_stream.tell()
         try:
             file_md5 = kwargs.pop('file_md5')
-            if not file_md5: raise KeyError()
+            if not file_md5:
+                raise KeyError()
         except KeyError:
             file_md5 = hash_stream(file_stream, 'md5')
             file_stream.seek(file_pos)
         try:
             file_sha1 = kwargs.pop('file_sha1')
-            if not file_sha1: raise KeyError()
+            if not file_sha1:
+                raise KeyError()
         except KeyError:
             file_sha1 = hash_stream(file_stream, 'sha1')
             file_stream.seek(file_pos)
         try:
             file_sha256 = kwargs.pop('file_sha256')
-            if not file_sha256: raise KeyError()
+            if not file_sha256:
+                raise KeyError()
         except KeyError:
             file_sha256 = hash_stream(file_stream, 'sha256')
             file_stream.seek(file_pos)
@@ -4226,8 +4225,7 @@ class SubmissionHelper(object):
             self.wait_for_completion(
                 results,
                 start_timestamp=start_ts,
-                wait_completion_interval_seconds=
-                    wait_completion_interval_seconds,
+                wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
                 verify=kwargs.get('verify', True)
             )
@@ -4275,8 +4273,7 @@ class SubmissionHelper(object):
 
             results_streams = self.submit_file_streams_and_wait_for_completion(
                 file_streams=list(file_streams.keys()),
-                wait_completion_interval_seconds=
-                    wait_completion_interval_seconds,
+                wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
                 **kwargs
             )
@@ -4325,8 +4322,7 @@ class SubmissionHelper(object):
             self.wait_for_completion(
                 results,
                 start_timestamp=start_ts,
-                wait_completion_interval_seconds=
-                    wait_completion_interval_seconds,
+                wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
                 verify=kwargs.get('verify', True)
             )
@@ -4363,7 +4359,7 @@ class SubmissionHelper(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         self.wait_for_completion(
-            submissions={1:submission},
+            submissions={1: submission},
             start_timestamp=start_timestamp,
             wait_completion_interval_seconds=wait_completion_interval_seconds,
             wait_completion_max_seconds=wait_completion_max_seconds,
@@ -4538,7 +4534,7 @@ class SubmissionHelper(object):
                         # this will be merged with "score=0" - it's up to the caller
                         # to check (or a future extension)
                         result = submissions[submission_id]
-                        result.set_score(score) # result.is_complete() becomes True
+                        result.set_score(score)  # result.is_complete() becomes True
                         del missing_results[task_uuid]
                         self.__logger.debug("Got result for task %s: %s",
                                             task_uuid, result)
@@ -4843,7 +4839,7 @@ class AnalyzeHelper(object):
         conf.read(conf_file)
 
         try:
-            url  = conf.get(conf_section, "url")
+            url = conf.get(conf_section, "url")
         except configparser.Error:
             url = None
 
@@ -4851,8 +4847,8 @@ class AnalyzeHelper(object):
             url = AnalyzeHelper.DEFAULT_ANALYST_API_URL
 
         try:
-            key  = conf.get(conf_section, "key")
-            token  = conf.get(conf_section, "api_token")
+            key = conf.get(conf_section, "key")
+            token = conf.get(conf_section, "api_token")
         except configparser.Error:
             raise configparser.Error("Missing credentials in configuration")
 
@@ -4863,7 +4859,6 @@ class AnalyzeHelper(object):
             logger=logger,
             secure=secure
         )
-
 
     def __init__(self, url, token, key, client, logger):
         """
@@ -5022,8 +5017,6 @@ class AnalyzeHelper(object):
 
         return True
 
-
-import optparse
 #############################################################################
 #
 # END API-CLIENT FUNCTIONALITY
@@ -5031,7 +5024,6 @@ import optparse
 # START API-SHELL FUNCTIONALITY
 #
 # NOTE: We only keep this code in this module for backwards-compatibility
-import sys
 
 
 def init_shell(banner):
@@ -5042,7 +5034,7 @@ def init_shell(banner):
         # pylint: disable=E0611,F0401
         from IPython.frontend.terminal import embed
         shell = embed.InteractiveShellEmbed(banner1=banner)
-    except ImportError: # iPython < 0.11
+    except ImportError:  # iPython < 0.11
         import IPython
 
         # pylint: disable=E1101
