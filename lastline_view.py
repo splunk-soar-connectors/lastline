@@ -104,7 +104,7 @@ def display_report(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
     # print context
-    return 'll_display_report.html'
+    return 'lastline_display_report.html'
 
 
 def display_artifacts(provides, all_app_runs, context):
@@ -122,4 +122,4 @@ def display_artifacts(provides, all_app_runs, context):
                     'summary': result.get_summary()
                 })
 
-    return 'll_display_artifacts.html'
+    return 'lastline_display_artifacts.html'

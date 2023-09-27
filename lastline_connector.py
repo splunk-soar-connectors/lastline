@@ -433,9 +433,9 @@ class LastlineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         task_id = param['id']
-        artifact_name = param.get('artifact_name', None)
-        artifact_password = param.get('password', None)
-        container_id = param.get('container_id', None)
+        artifact_name = param.get('artifact_name')
+        artifact_password = param.get('password')
+        container_id = param.get('container_id')
         if not container_id:
             container_id = self.get_container_id()
 
