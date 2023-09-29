@@ -40,6 +40,6 @@ LASTLINE_ERROR_TASK_ID_NOT_FOUND = "Task ID not found"
 LASTLINE_SLEEP_SECS = 10
 LASTLINE_DEFAULT_TIMEOUT = 30
 LASTLINE_JSON_POLL_TIMEOUT_SECS = "timeout"
-LASTLINE_MAX_TIMEOUT_DEF_SECS = 5 * 60
+LASTLINE_MAX_TIMEOUT_DEF_SECS = 120
 LASTLINE_POLL_TIMEOUT = "Polled for the maximum number of times"
 LASTLINE_POLL_TIMEOUT += " Report not yet ready. Please try 'get report' action with id: {0} later"
