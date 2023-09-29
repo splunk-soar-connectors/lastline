@@ -4,7 +4,7 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.py",
-    "app_version": "3.0.0",
+    "app_version": "3.1.0",
     "utctime_updated": "2022-01-07T21:25:08.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
