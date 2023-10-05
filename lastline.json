@@ -2335,7 +2335,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.password",
-                    "data_type": "password",
+                    "data_type": "string",
                     "column_name": "Password",
                     "column_order": 2
                 },
