@@ -12,7 +12,7 @@
     "product_version_regex": ".*",
     "min_phantom_version": "6.1.0",
     "publisher": "Splunk Community",
-    "fips_compliant": false,
+    "fips_compliant": true,
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
@@ -124,7 +124,7 @@
                         "pe file"
                     ],
                     "example_values": [
-                        "0c96c0561edabf40928e49f0589b9bf41ef70fea"
+                        "TESTc0561edabf40928e49f0589b9bf41ef70fea"
                     ]
                 },
                 {
@@ -138,14 +138,14 @@
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_md5",
                     "data_type": "string",
                     "example_values": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_sha1",
                     "data_type": "string",
                     "example_values": [
-                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                        "TEST7f7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
@@ -211,7 +211,7 @@
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
                     "data_type": "string",
                     "example_values": [
-                        "file://9227f7e2989ef79522e36e103b2270adc81abd80"
+                        "file://TESTf7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
@@ -232,7 +232,7 @@
                     "data_path": "action_result.data.*.report.analysis.subject.md5",
                     "data_type": "string",
                     "example_values": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
@@ -250,14 +250,14 @@
                     "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_md5",
                     "data_type": "string",
                     "example_values": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_sha1",
                     "data_type": "string",
                     "example_values": [
-                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                        "92TEST7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
@@ -1869,7 +1869,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: fc1TESTbe81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/TEST35be81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -2242,7 +2242,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: EXAMPLE35be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fcTESTbe81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -2310,44 +2310,69 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.id",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "id",
-                    "column_order": 0
+                    "column_name": "Status",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.artifact_name",
                     "data_type": "string",
-                    "column_name": "artifact_name",
+                    "column_name": "Artifact_name",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.password",
-                    "data_type": "password",
-                    "column_name": "password",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.container_id",
                     "data_type": "numeric",
-                    "column_name": "container_id",
+                    "column_name": "Container_id",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 4
+                    "column_name": "ID",
+                    "column_order": 0
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "password",
+                    "column_name": "Password",
+                    "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.timestamp",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
                     "example_values": [
-                        122
+                        "automation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "TESTa847064436052305646d97a5317277e40ebf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
                     ]
                 },
                 {
@@ -2361,7 +2386,7 @@
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                        "putty.exe_TEST2b2ce8df00200223a837f005aa30_0_screenshot_122.png"
                     ]
                 },
                 {
@@ -2370,6 +2395,10 @@
                     "example_values": [
                         "2023-12-05 13:39:31.000000"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.source_file",
@@ -2383,46 +2412,6 @@
                     "data_type": "boolean"
                 },
                 {
-                    "data_path": "action_result.data.*.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.hash",
-                    "data_type": "string",
-                    "example_values": [
-                        "d3d9a847064436052305646d97a5317277e40ebf"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.vault_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "d3d9a847064436052305646d97a5317277e40ebf"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.container",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.created_via",
-                    "data_type": "string",
-                    "example_values": [
-                        "automation"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.task_id",
                     "data_type": "string",
                     "example_values": [
@@ -2430,15 +2419,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.file_name",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "numeric",
                     "example_values": [
-                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                        122
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TESTa847064436052305646d97a5317277e40ebf"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.vault_state",
@@ -2447,6 +2439,14 @@
                         "stored",
                         "failed"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2466,12 +2466,5 @@
             },
             "versions": "EQ(*)"
         }
-    ],
-    "pip_dependencies": {
-        "wheel": [
-        ]
-    },
-    "pip39_dependencies": {
-        "wheel": []
-    }
+    ]
 }
