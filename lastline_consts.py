@@ -1,6 +1,6 @@
 # File: lastline_consts.py
 #
-# Copyright (c) 2015-2022 Splunk Inc.
+# Copyright (c) 2015-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@ ANALYSIS_SUBJECT_KEY = 'analysis_subjects'
 
 VAULT_ERROR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERROR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
+VAULT_ARTIFACTS_TOTAL_KEY = 'artifacts_total'
+VAULT_ARTIFACTS_STORED_KEY = 'artifacts_stored'
+VAULT_ARTIFACTS_FAILED_KEY = 'artifacts_failed'
 
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
 LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"
@@ -35,7 +38,8 @@ LASTLINE_ERROR_SUBMIT_URL = "Error submitting URL"
 LASTLINE_ERROR_TASK_ID_NOT_FOUND = "Task ID not found"
 
 LASTLINE_SLEEP_SECS = 10
+LASTLINE_DEFAULT_TIMEOUT = 30
 LASTLINE_JSON_POLL_TIMEOUT_SECS = "timeout"
-LASTLINE_MAX_TIMEOUT_DEF_SECS = 5 * 60
+LASTLINE_MAX_TIMEOUT_DEF_SECS = 120
 LASTLINE_POLL_TIMEOUT = "Polled for the maximum number of times"
 LASTLINE_POLL_TIMEOUT += " Report not yet ready. Please try 'get report' action with id: {0} later"

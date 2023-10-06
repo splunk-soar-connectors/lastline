@@ -27,7 +27,8 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [detonate file](#action-detonate-file) - Run the file in the Lastline sandbox and retrieve the analysis results  
 [get report](#action-get-report) - Query for results of an already completed task in Lastline  
 [detonate url](#action-detonate-url) - Load a URL in the Lastline sandbox and retrieve the analysis results  
-[test connectivity](#action-test-connectivity) - This action connects to the server to verify the connection  
+[test connectivity](#action-test-connectivity) - This action connects to the server to verify the connection
+[get artifact](#action-get-artifact) - Loads artifacts from Lastline and stores them in Vault
 
 ## action: 'detonate file'
 Run the file in the Lastline sandbox and retrieve the analysis results
@@ -488,3 +489,51 @@ No parameters are required for this action
 
 #### Action Output
 No Output
+
+## action: 'get artifact'
+Loads artifacts from Lastline and stores them in Vault
+
+Type: **investigate**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**id** |  required  | Task ID to get the results of | string |  `lastline task id`
+**artifact name** |  optional  | Name of the Artifact (when not specified all artifacts will be stored) | string |  `file name`
+**password** |  optional  | Optional password for artifact encryption | string |  `password`
+**container id** |  optional  | Optional container id for artifact storage (Is detected automatically) | number |  `container id`
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.id | string |  `lastline task id`
+action\_result\.parameter\.artifact_name | string |  `file name`
+action\_result\.parameter\.password | string |  `password`
+action\_result\.parameter\.container_id | number |  `container id` 
+action\_result\.data\.\*\.timestamp | number | 
+action\_result\.data\.\*\.metadata_type | string | 
+action\_result\.data\.\*\.name | string | 
+action\_result\.data\.\*\.retention_date | string | 
+action\_result\.data\.\*\.source_file | string |  `file name`
+action\_result\.data\.\*\.succeeded | boolean | 
+action\_result\.data\.\*\.message | string | 
+action\_result\.data\.\*\.hash | string |  `file hash`
+action\_result\.data\.\*\.vault_id | string |  `vault id`
+action\_result\.data\.\*\.container | number |  `container id`
+action\_result\.data\.\*\.size | number |  
+action\_result\.data\.\*\.id | number |  `file id`
+action\_result\.data\.\*\.created_via | string |
+action\_result\.data\.\*\.task_id | string |  `lastline task id`
+action\_result\.data\.\*\.file_name | string |  `file name`
+action\_result\.data\.\*\.vault_state | string | 
+action\_result\.summary\.id | string |  `lastline task id` 
+action\_result\.summary\.result\_url | string |  `url`  `domain` 
+action\_result\.summary\.type | string | 
+action\_result\.summary\.artifacts_stored | numeric | 
+action\_result\.summary\.artifacts_failed | numeric | 
+action\_result\.summary\.artifacts_total | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |
