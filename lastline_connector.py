@@ -1,6 +1,6 @@
 # File: lastline_connector.py
 #
-# Copyright (c) 2015-2022 Splunk Inc.
+# Copyright (c) 2015-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 #
 # Phantom imports
 import hashlib
+import json
+import sys
 import time
 # Other imports used by this connector
 from datetime import datetime
 
 import phantom.app as phantom
 import phantom.rules as phrules
+import requests
 from phantom.app import ActionResult, BaseConnector
+from phantom.vault import Vault as Vault
 
 from lastline_consts import *
 from llmodule.analysis_apiclient import ANALYSIS_API_NO_RESULT_FOUND, AnalysisAPIError, AnalysisClient
@@ -34,6 +38,7 @@ class LastlineConnector(BaseConnector):
     ACTION_ID_QUERY_FILE = "query_file"
     ACTION_ID_QUERY_URL = "query_url"
     ACTION_ID_SANDBOX_RESULTS = "get_detonation_result"
+    ACTION_ID_GET_ARTIFACT = "get_artifact"
 
     def __init__(self):
 
@@ -422,6 +427,94 @@ class LastlineConnector(BaseConnector):
         self.save_progress(LASTLINE_SUCCESS_CONNECTIVITY_TEST)
         return self.set_status(phantom.APP_SUCCESS)
 
+    def _get_artifact(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        task_id = param['id']
+        artifact_name = param.get('artifact_name')
+        artifact_password = param.get('password')
+        container_id = param.get('container_id')
+        if not container_id:
+            container_id = self.get_container_id()
+
+        # Get Report
+        ret_val, report = self._poll_task_status(task_id, action_result, task_start_time=None)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        if not report:
+            return action_result.set_status(phantom.APP_ERROR, LASTLINE_POLL_TIMEOUT.format(task_id))
+
+        if 'analysis_metadata' not in report or not isinstance(report['analysis_metadata'], list):
+            return action_result.set_status(phantom.APP_ERROR, "No analysis metadata in report")
+
+        artifact_names = [artifact['name'] for artifact in report['analysis_metadata']]
+
+        if artifact_name:
+            if artifact_name in artifact_names:
+                artifact_names = [artifact_name]
+            else:
+                error_message = f"Requested artifact not found, report provides: {', '.join(artifact_names)}"
+                self.save_progress(error_message)
+                action_result.add_data({'error': error_message})
+                return action_result.set_status(phantom.APP_ERROR, error_message)
+
+        self.save_progress(f"Downloading the following artifacts: {json.dumps(artifact_names)}")
+        summary = {
+            TASK_ID_KEY: task_id,
+            RESULTS_URL_KEY: self._results_url_template.format(task_id),
+            SUMMARY_TYPE_KEY: ANALYSIS_TYPE_FILE,
+            VAULT_ARTIFACTS_STORED_KEY: 0,
+            VAULT_ARTIFACTS_FAILED_KEY: 0,
+            VAULT_ARTIFACTS_TOTAL_KEY: 0
+        }
+
+        downloaded_files = set()
+        for artifact in report['analysis_metadata']:
+            file_name = artifact['name']
+            if file_name not in artifact_names or file_name in downloaded_files:
+                continue
+
+            downloaded_files.add(file_name)
+            summary[VAULT_ARTIFACTS_TOTAL_KEY] = summary[VAULT_ARTIFACTS_TOTAL_KEY] + 1
+            artifact_result = self._client.get_report_artifact(task_id, report['uuid'], file_name, artifact_password)
+            artifact_value = artifact_result.getvalue()
+            report_subject = ""
+            try:
+                if 'analysis' in report:
+                    url = report['analysis']['network']['requests'][0]['url']
+                    artifact['url'] = url
+                    report_subject = ''.join(e if e.isalnum() else '_' for e in url)
+                if 'analysis_subjects' in report:
+                    source_file = report['analysis_subjects'][0]['process']['arguments'].split('\\')[-1]
+                    artifact['source_file'] = source_file
+                    report_subject = source_file
+            except:
+                pass
+
+            file_name = f"{report_subject}_{task_id}_{self.get_app_run_id()}_{file_name}"
+            vault_response = Vault.create_attachment(artifact_value, container_id, file_name=file_name)
+            artifact.update(vault_response)
+            artifact['task_id'] = task_id
+            artifact['name'] = file_name
+            artifact['file_name'] = file_name
+
+            if vault_response.get('succeeded'):
+                summary[VAULT_ARTIFACTS_STORED_KEY] = summary[VAULT_ARTIFACTS_STORED_KEY] + 1
+                artifact['vault_state'] = 'stored'
+            else:
+                summary[VAULT_ARTIFACTS_FAILED_KEY] = summary[VAULT_ARTIFACTS_FAILED_KEY] + 1
+                artifact['vault_state'] = 'error'
+            action_result.add_data(artifact)
+
+        action_result.update_summary(summary)
+
+        if summary[VAULT_ARTIFACTS_STORED_KEY] == summary[VAULT_ARTIFACTS_TOTAL_KEY]:
+            return action_result.set_status(phantom.APP_SUCCESS, "All artifacts stored successfully")
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Some Artifacts could not be stored")
+
     def handle_action(self, param):
         """Function that handles all the actions
 
@@ -432,6 +525,7 @@ class LastlineConnector(BaseConnector):
         """
 
         action = self.get_action_identifier()
+        result = phantom.APP_SUCCESS
 
         if action == self.ACTION_ID_QUERY_FILE:
             result = self._query_file(param)
@@ -441,29 +535,73 @@ class LastlineConnector(BaseConnector):
             result = self._get_detonation_result(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self._test_connectivity(param)
+        elif action == self.ACTION_ID_GET_ARTIFACT:
+            result = self._get_artifact(param)
 
         return result
 
 
 if __name__ == '__main__':
+    import argparse
 
-    import json
-    import sys
+    argparser = argparse.ArgumentParser()
 
-    import pudb
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
-    pudb.set_trace()
+    args = argparser.parse_args()
+    session_id = None
 
-    with open(sys.argv[1]) as f:
+    username = args.username
+    password = args.password
+    verify = args.verify
 
+    if username is not None and password is None:
+        # User specified a username but not a password, so ask
+        import getpass
+
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        try:
+            login_url = LastlineConnector._get_phantom_base_url() + '/login'
+
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=verify, timeout=LASTLINE_DEFAULT_TIMEOUT)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=verify, timeout=LASTLINE_DEFAULT_TIMEOUT,
+                               data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            sys.exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
-
         in_json = json.loads(in_json)
-
         print(json.dumps(in_json, indent=4))
 
         connector = LastlineConnector()
+        connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print(ret_val)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     sys.exit(0)

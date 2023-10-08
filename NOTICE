@@ -1,9 +1,2 @@
 Splunk SOAR Lastline
-Copyright (c) 2015-2021 Splunk Inc.
-
-Third-party Software Attributions:
-
-Library: requests
-Version: 2.25.0
-License: Apache 2.0
-Kenneth Reitz
+Copyright (c) 2015-2023 Splunk Inc.

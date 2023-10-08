@@ -4,19 +4,19 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox",
     "type": "sandbox",
     "main_module": "lastline_connector.py",
-    "app_version": "3.0.0",
+    "app_version": "3.1.0",
     "utctime_updated": "2022-01-07T21:25:08.000000Z",
     "package_name": "phantom_lastline",
     "product_vendor": "Lastline",
     "product_name": "Lastline",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.3.5",
+    "min_phantom_version": "6.1.0",
     "publisher": "Splunk Community",
     "fips_compliant": true,
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) 2015-2022 Splunk Inc.",
+    "license": "Copyright (c) 2015-2023 Splunk Inc.",
     "python_version": "3",
     "configuration": {
         "base_url": {
@@ -37,7 +37,7 @@
             "order": 5,
             "description": "Timeout (seconds)",
             "required": true,
-            "defualt": 120
+            "default": 120
         },
         "license_key": {
             "data_type": "password",
@@ -124,41 +124,41 @@
                         "pe file"
                     ],
                     "example_values": [
-                        "0c96c0561edabf40928e49f0589b9bf41ef70fea"
+                        "TESTc0561edabf40928e49f0589b9bf41ef70fea"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_length",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         904198
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_md5",
                     "data_type": "string",
-                    "example_value": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                    "example_values": [
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_sha1",
                     "data_type": "string",
-                    "example_value": [
-                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                    "example_values": [
+                        "TEST7f7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.content_type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/pdf"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.end",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         100
                     ]
                 },
@@ -185,21 +185,21 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type_str",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         6
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.start",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.status",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         200
                     ]
                 },
@@ -210,29 +210,29 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.url",
                     "data_type": "string",
-                    "example_value": [
-                        "file://9227f7e2989ef79522e36e103b2270adc81abd80"
+                    "example_values": [
+                        "file://TESTf7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.result.analysis_ended",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "2021-07-23 14:33:42+0000"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.result.detector",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "3.1.2490"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.subject.md5",
                     "data_type": "string",
-                    "example_value": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                    "example_values": [
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
@@ -242,42 +242,42 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.subject.type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "file"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_md5",
                     "data_type": "string",
-                    "example_value": [
-                        "9657a182c22d26c78872d009298ba7e6"
+                    "example_values": [
+                        "TESTa182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.text_from_documents.*.doc_sha1",
                     "data_type": "string",
-                    "example_value": [
-                        "9227f7e2989ef79522e36e103b2270adc81abd80"
+                    "example_values": [
+                        "92TEST7e2989ef79522e36e103b2270adc81abd80"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.text_from_documents.*.text",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "Anomali ThreatStream API\n\nReference Guide\n\nVersion: v2.5.5\n\nDecember 21, 2020\n\n\fCopyright Notice\n\n 2020 Anomali, Inc. All rights reserved.\nThreatStream is a registered servicemark. Optic, Anomali Harmony, and Anomali Reports are registered trademarks.\nAll other brands, products, and company names used herein may be trademarks of their respective owners.\n\nSupport\n\nSupport Portal\n\nEmail\n\nPhone\n\nTwitter\n\nhttps://support.threatstream.com\n\nsupport@threatstream.com\n\n+1 844-4-THREATS\n\n@threatstream\n\nDocumentation Updates\n\nDate\n\n12/21/2020\n\n11/23/2020\n\n10/14/2020\n\n9/1/2020\n\n7/20/2020\n\n7/2/2020\n\n6/23/2020\n\n6/11/2020\n\nProduct Version\n\nDescription\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nv2.5.5\n\nUpdated \"Passive DNS\" on page39.\n\nUpdated \"Introduction\" on page5 and\n\"Threat Model \" on page65. Added\n\"SSO History\" on page62.\n\nUpdated \"Threat Model \" on page65.\n\nUpdated \"User Audit\" on page120.\n\nUpdated \"Import (without approval)\" on\npage17.\n\nUpdated \"Authenticating to\nThreatStream\" on page5.\n\nUpdated \"Appstorehistory\" on page125\nand \"Feed\" on page132.\n\nAdded \"Appstorehistory\" on page125.\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 2 of 158\n\n\fCONTENTS\n\nIntroduction\n\nAccessing the API\nPrerequisites\nUsing API to Access ThreatStream OnPrem\n\nImport\n\nImport (with approval)\nImport (without approval)\n\nIntelligence\n\nManaging Threat Model Entity and Observable Tags\n\nConfidence\n\nManaging Observable Tags in Bulk\n\nIntelligence Enrichments\n\nRules\n\nExamples\n\nSandbox\n\nSnapshot\n\nSSO History\n\nThreat Model\n\nThreat Model Search\nActors\nCampaigns\nIncidents\nSignatures\nTipreport\n\n5\n5\n8\n8\n\n10\n10\n17\n\n24\n\n33\n\n35\n\n37\n\n39\n\n43\n49\n\n50\n\n54\n\n62\n\n65\n65\n70\n76\n82\n87\n91\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 3 of 158\n\n\fReference Guide\n\nTTPs (Tactics, Techniques, and Procedures)\nVulnerabilities\nManaging Threat Model Associations\n\nInvestigation\n\nUser Administration\n\nRequest\n\nAttributes\n\nUser Audit\n\nAttributes\n\nAppstorehistory\n\nWhitelist\n\nFeed\n\nAttributes\nExamples\n\nAppendix 1: Intelligence Fields in ThreatStream\n\nAppendix 2: Indicator Types in ThreatStream\n\nAppendix 3: Fraud Indicator Types for ThreatStream OnPrem\n\nAppendix 4: Threat Types in ThreatStream\n\nSend Documentation Feedback\n\n97\n102\n106\n\n109\n\n116\n116\n116\n\n120\n120\n\n125\n\n128\n\n132\n132\n132\n\n134\n\n138\n\n153\n\n155\n\n158\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 4 of 158\n\n\fIntroduction\n\nAnomali ThreatStream (previously known as ThreatStream Optic) is accessible through RESTAPIs,\nwhich are available to all Premium customers. The APIs offers bi-directional interaction with the\nThreatStream platform.\nThe APIs allow you to pull threat intelligence from the ThreatStream platform for use with other third-\nparty tools, import observables into ThreatStream from any source, manage threat model entities and\ninvestigations, and so on.\n\nAccessing the API\n\nTo access the API, use the following base URL:\n\nhttps://api.threatstream.com/api/<api_version>/<resource>/\nwhere\napi_version is either v1 or v2. Refer to each API call to determine the version to use.\nresource is APIendpoint; for example, import, intelligence, tipreport\n\nAuthenticating to ThreatStream\nMaking requests through the APIrequires authenticating to ThreatStream using your usernamethe\nemail address associated with your ThreatStream accountand your dedicated APIKey. You can\nreference your username and APIKey on the My Profile tab within ThreatStream settings.\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 5 of 158\n\n\fReference Guide\nIntroduction\n\nSpecifying your username and API Key in the header of the request is the most secure method of\nauthentication. Anomali recommends using this authentication method, as shown in the following\nexample:\n\ncurl 'https://api.threatstream.com/api/v2/intelligence/?itype=bot_ip' -H\n'Authorization: apikey <username>:<api_key>'\n\nNote: Specifying usernames and API Keys in the URL of the request will be deprecated as an\navailable authentication method for ThreatStream in a future release.\n\nUsing Operators\nThe first API operator called after the resource must start with a question mark and subsequent\noperators must begin with an ampersand.\nExample:\n\ncurl 'https://api.threatstream.com/api/v1/intelligence/?itype=bot_ip&status=active'\n-H 'Authorization: apikey <username>:<api_key>'\n\nAPIMetadata\nThe following is an example of typical ThreatStream API metadata:\n\nAnomali ThreatStream API (v2.5.5)\n\nPage 6 of 158\n\n\fReference Guide\nIntroduction\n\nl total_countthe total number of results that can be retrieved by the API call.\n\nl approximate_countset to true in cases where API calls yield exceptionally large datasets to\n\nindicate that the total count may not include all results.\n\nNote: The approximate_count metadata attribute is only included in API query responses\nunder certain conditions. Typically, these are scenarios where results are exceptionally large\nand approximation improves application performance.\n\nl tooktime in milliseconds ThreatStream took to retrieve the data.\n\nl nextcall that can be used to iteratively retrieve the next set of data in the total results.\n\nl limitnumber of results returned when API call is made. See \"Limiting Results\" below.\n\nl o\n..."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.child_url_type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "url-in-pdf-text"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.source_url",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "file://testf7e2989ef79522e36e103b2270adc81atest"
                     ]
                 },
@@ -288,14 +288,14 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.urls_from_documents.*.url",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "http://ui.test.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis_engine_version",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         50399674
                     ]
                 },
@@ -425,7 +425,7 @@
                 {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.retention_date",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "2021-10-21 14:33:44"
                     ]
                 },
@@ -1411,14 +1411,14 @@
                 {
                     "data_path": "action_result.data.*.report.md5",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "9657a182c22d26c78872d009298ba7e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.mime_type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/pdf"
                     ]
                 },
@@ -1445,21 +1445,21 @@
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.detector_id",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "llweb:prefilter-document-mime-type"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.test",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -1467,14 +1467,14 @@
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.version",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         1
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0
                     ]
                 },
@@ -1485,7 +1485,7 @@
                 {
                     "data_path": "action_result.data.*.report.score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         5
                     ]
                 },
@@ -1735,42 +1735,42 @@
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.file_name",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "test.py"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.md5",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "test6ed13853dfa68bf88a72d649test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.mime_type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "text/x-python"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.sha1",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "testdae1fecb61ece28e5825729d58c6821test"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.task_score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.extracted_files.*.task_uuid",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "test174fe5f700102a7dda179f83test"
                     ]
                 },
@@ -1801,14 +1801,14 @@
                 {
                     "data_path": "action_result.data.*.report.md5",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "testd5e4d630bc063b5305d91ce53tes"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.mime_type",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/x-gzip"
                     ]
                 },
@@ -1869,7 +1869,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: fc1TESTbe81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/TEST35be81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -1939,14 +1939,14 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.desc",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "Info: Page contains a form"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.is_test",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -1954,21 +1954,21 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.name",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "llweb:info-page-contains-form"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         0
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.activities.*.version",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         1
                     ]
                 },
@@ -2029,7 +2029,7 @@
                 {
                     "data_path": "action_result.data.*.report.analysis.network.requests.*.relation_type_str",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "USER"
                     ]
                 },
@@ -2114,7 +2114,7 @@
                 {
                     "data_path": "action_result.data.*.report.analysis_metadata.*.timestamp",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         6
                     ]
                 },
@@ -2145,28 +2145,28 @@
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.activity",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "A script used the fromCharCode function"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.detector_id",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "llweb:prefilter-from-char-code-function"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         5
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.test",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         false,
                         true
                     ]
@@ -2174,14 +2174,14 @@
                 {
                     "data_path": "action_result.data.*.report.prefilter_scanners.*.version",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         2
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report.prefilter_score",
                     "data_type": "numeric",
-                    "example_value": [
+                    "example_values": [
                         5
                     ]
                 },
@@ -2242,7 +2242,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Id: fc1935be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fc1935be81a8001007bd9a6056164528, Type: file, Target: Unknown"
+                        "Id: EXAMPLE35be81a8001007bd9a6056164528, Result url: https://user.lastline.com/portal#/analyst/task/fcTESTbe81a8001007bd9a6056164528, Type: file, Target: Unknown"
                     ]
                 },
                 {
@@ -2278,30 +2278,193 @@
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "get artifact",
+            "identifier": "get_artifact",
+            "description": "Download Lastline generated artifact and store to SOAR/Phantom Vault",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Task ID to get the results of",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "artifact_name": {
+                    "description": "Name of the Artifact (when not specified all artifacts will be stored)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "password": {
+                    "description": "Optional for artifact encryption",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "container_id": {
+                    "description": "Optional container id for artifact storage (Is detected automatically)",
+                    "data_type": "numeric",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_name",
+                    "data_type": "string",
+                    "column_name": "Artifact_name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "column_name": "Container_id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string",
+                    "column_name": "Password",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
+                    "example_values": [
+                        "automation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "putty.exe_68d12b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "TESTa847064436052305646d97a5317277e40ebf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "screenshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "putty.exe_TEST2b2ce8df00200223a837f005aa30_0_screenshot_122.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retention_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-12-05 13:39:31.000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source_file",
+                    "data_type": "string",
+                    "example_values": [
+                        "putty.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.succeeded",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.task_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEST00200223a837f000200223aEXAMPLE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        122
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TESTa847064436052305646d97a5317277e40ebf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "stored",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 20,
+                "height": 10,
+                "view": "lastline_view.display_artifacts",
+                "title": "Lastline Artifacts"
+            },
+            "versions": "EQ(*)"
         }
-    ],
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
-            },
-            {
-                "module": "chardet",
-                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
-            },
-            {
-                "module": "idna",
-                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
-            },
-            {
-                "module": "requests",
-                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
-            },
-            {
-                "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
-            }
-        ]
-    }
+    ]
 }
