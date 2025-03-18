@@ -1,6 +1,6 @@
 # File: lastline_consts.py
 #
-# Copyright (c) 2015-2023 Splunk Inc.
+# Copyright (c) 2015-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,22 +13,22 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 RESULT_REPORT_KEY = "report"
-TASK_ID_KEY = 'id'
-TARGET_KEY = 'target'
-RESULTS_URL_KEY = 'result_url'
-ANALYSIS_TYPE_FILE = 'file'
-ANALYSIS_TYPE_URL = 'url'
-SUMMARY_TYPE_KEY = 'type'
-ANALYSIS_KEY = 'analysis'
-URL_ANALYSIS_ENDED_KEY = 'analysis_ended'
-FILE_ANALYSIS_END_KEY = 'analysis_end'
-ANALYSIS_SUBJECT_KEY = 'analysis_subjects'
+TASK_ID_KEY = "id"
+TARGET_KEY = "target"
+RESULTS_URL_KEY = "result_url"
+ANALYSIS_TYPE_FILE = "file"
+ANALYSIS_TYPE_URL = "url"
+SUMMARY_TYPE_KEY = "type"
+ANALYSIS_KEY = "analysis"
+URL_ANALYSIS_ENDED_KEY = "analysis_ended"
+FILE_ANALYSIS_END_KEY = "analysis_end"
+ANALYSIS_SUBJECT_KEY = "analysis_subjects"
 
 VAULT_ERROR_INVALID_VAULT_ID = "Invalid Vault ID"
 VAULT_ERROR_FILE_NOT_FOUND = "Vault file could not be found with supplied Vault ID"
-VAULT_ARTIFACTS_TOTAL_KEY = 'artifacts_total'
-VAULT_ARTIFACTS_STORED_KEY = 'artifacts_stored'
-VAULT_ARTIFACTS_FAILED_KEY = 'artifacts_failed'
+VAULT_ARTIFACTS_TOTAL_KEY = "artifacts_total"
+VAULT_ARTIFACTS_STORED_KEY = "artifacts_stored"
+VAULT_ARTIFACTS_FAILED_KEY = "artifacts_failed"
 
 LASTLINE_GENERATED_RANDOM_HASH = "Generated Random hash '{gen_hash}' to query"
 LASTLINE_SUCCESS_CONNECTIVITY_TEST = "Test Connectivity Passed"

@@ -1,6 +1,6 @@
 # File: analysis_apiclient.py
 #
-# Copyright (c) 2015-2023 Splunk Inc.
+# Copyright (c) 2015-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -72,7 +72,6 @@ provides an interactive shell for manually sending requests to the Lastline Anal
 API, and it can be used to experiment with the API for analyzing files or URLs. For details,
 refer to the :ref:`API Client Shell documentation <analysis_client_shell>`.
 """
-from __future__ import print_function
 
 import cgi
 import collections
@@ -86,12 +85,11 @@ import os
 import ssl
 import sys
 import time
-from builtins import object  # pylint: disable=redefined-builtin
 
 import requests
 import simplejson
-from future import standard_library
-from future import utils as future_utils
+from future import standard_library, utils as future_utils
+
 
 standard_library.install_aliases()
 
@@ -119,14 +117,11 @@ except ImportError:
 if __name__ == "__main__":
     try:
         requests_version = requests.__version__
-        if not requests_version.startswith('2.2'):
+        if not requests_version.startswith("2.2"):
             raise Exception()
     except Exception:
-        requests_version = '?'
-        print((
-            "Warning: Your version of requests ({}) might not be compatible with this "
-            "module.".format(requests_version)
-        ), file=sys.stderr)
+        requests_version = "?"
+        print((f"Warning: Your version of requests ({requests_version}) might not be compatible with this module."), file=sys.stderr)
         print("Officially supported are versions 2.2.x", file=sys.stderr)
 
 
@@ -159,15 +154,15 @@ ANALYSIS_API_INVALID_PRIORITY = 124
 
 # other consts
 ANALYSIS_API_NO_REPORT_DETAILS = -1
-ANALYSIS_API_EXPORT_REPORT_TYPE_OVERVIEW = 'OVERVIEW'
-ANALYSIS_API_EXPORT_REPORT_TYPE_ALL = 'ALL'
-ANALYSIS_API_EXPORT_REPORT_TYPE_FULL = 'FULL'
+ANALYSIS_API_EXPORT_REPORT_TYPE_OVERVIEW = "OVERVIEW"
+ANALYSIS_API_EXPORT_REPORT_TYPE_ALL = "ALL"
+ANALYSIS_API_EXPORT_REPORT_TYPE_FULL = "FULL"
 ANALYSIS_API_EXPORT_REPORT_TYPES = (
     ANALYSIS_API_EXPORT_REPORT_TYPE_OVERVIEW,
     ANALYSIS_API_EXPORT_REPORT_TYPE_ALL,
-    ANALYSIS_API_EXPORT_REPORT_TYPE_FULL
+    ANALYSIS_API_EXPORT_REPORT_TYPE_FULL,
 )
-ANALYSIS_API_EXPORT_FORMAT_PDF = 'PDF'
+ANALYSIS_API_EXPORT_FORMAT_PDF = "PDF"
 ANALYSIS_API_EXPORT_REPORT_FORMATS = (ANALYSIS_API_EXPORT_FORMAT_PDF,)
 
 
@@ -181,6 +176,7 @@ class WaitResultTimeout(Error):
     """
     Waiting for results timed out.
     """
+
     def __init__(self, msg="Waiting for results timed out"):
         Error.__init__(self, msg)
 
@@ -194,36 +190,35 @@ class InvalidSubApiType(Error):
     Operations involving parts other than these will
     raise this exceptions.
     """
+
     def __init__(self, sub_api_type):
         Error.__init__(self)
         self.sub_api_type = sub_api_type
 
     def __str__(self):
-        return "Invalid sub API '%s', expecting one of (%s)" % (
-                        self.sub_api_type,
-                        ','.join(AnalysisClientBase.SUB_APIS))
+        return "Invalid sub API '{}', expecting one of ({})".format(self.sub_api_type, ",".join(AnalysisClientBase.SUB_APIS))
 
 
 class InvalidFormat(Error):
     """
     Invalid format requested.
     """
+
     def __init__(self, requested_format):
         Error.__init__(self)
         self.format = requested_format
 
     def __str__(self):
-        return "Requested Invalid Format '%s', expecting one of (%s)" % (
-                         self.format,
-                         ','.join(AnalysisClientBase.FORMATS))
+        return "Requested Invalid Format '{}', expecting one of ({})".format(self.format, ",".join(AnalysisClientBase.FORMATS))
 
 
 class CommunicationError(Error):
     """
     Contacting Malscape failed.
     """
+
     def __init__(self, msg=None, error=None):
-        Error.__init__(self, msg or error or '')
+        Error.__init__(self, msg or error or "")
         self.__error = error
 
     def internal_error(self):
@@ -235,6 +230,7 @@ class FailedRequestError(CommunicationError):
     Exception class to group communication errors returned
     on failed HTTP requests.
     """
+
     def __init__(self, msg=None, error=None, status_code=None):
         CommunicationError.__init__(self, msg, error)
         self.__status_code = status_code
@@ -256,6 +252,7 @@ class AnalysisAPIError(Error):
     The `error_code` member of this exception
     is the :ref:`error code returned by the API<error_codes>`.
     """
+
     def __init__(self, msg, error_code):
         Error.__init__(self)
         self.msg = msg
@@ -263,8 +260,8 @@ class AnalysisAPIError(Error):
 
     def __str__(self):
         if self.error_code:
-            return "Analysis API error (%s): %s" % (self.error_code, self.msg)
-        return "Analysis API error: %s" % self.msg
+            return f"Analysis API error ({self.error_code}): {self.msg}"
+        return f"Analysis API error: {self.msg}"
 
 
 class RequestError(AnalysisAPIError):
@@ -388,11 +385,12 @@ class NamedStringIO(io.BytesIO):
     The name of this class is preserved for legacy code.
     Despite the name, this class holds binary data, not text.
     """
-    def __init__(self, buf=b'', name=None):
+
+    def __init__(self, buf=b"", name=None):
         # Sanitize buf:
         # None value is transformed into 'None'
         if not buf:
-            buf = b''
+            buf = b""
         io.BytesIO.__init__(self, buf)
         self._name = name
         self._len = len(buf)
@@ -456,15 +454,13 @@ def hash_stream(stream, algorithm):
     """
     if hasattr(hashlib, "algorithms"):
         if algorithm not in hashlib.algorithms:
-            raise NotImplementedError("Hash function '%s' is not available" %
-                                      algorithm)
+            raise NotImplementedError(f"Hash function '{algorithm}' is not available")
 
     try:
         m = hashlib.new(algorithm)
     except ValueError:
         # unsupported hash type
-        raise NotImplementedError("Hash function '%s' is not available" %
-                                  algorithm)
+        raise NotImplementedError(f"Hash function '{algorithm}' is not available")
 
     while True:
         s = stream.read(4096)
@@ -502,8 +498,7 @@ def parse_datetime(d):
     try:
         return datetime.datetime.strptime(d, AnalysisClientBase.DATE_FMT)
     except ValueError:
-        raise ValueError("Date '%s' does not match format '%s'" % (
-                         d, "%Y-%m-%d[ %H:%M:%S[.%f]]'"))
+        raise ValueError("Date '{}' does not match format '{}'".format(d, "%Y-%m-%d[ %H:%M:%S[.%f]]'"))
 
 
 def get_direction(is_download):
@@ -518,7 +513,7 @@ def get_direction(is_download):
     return "TO_SERVER"
 
 
-class TaskCompletion(object):
+class TaskCompletion:
     """
     Helper class to get score for all completed tasks
 
@@ -529,6 +524,7 @@ class TaskCompletion(object):
         print completed_task.task_uuid, completed_task.score
 
     """
+
     def __init__(self, analysis_client):
         """
         :param analysis_apiclient.AnalysisClientBase analysis_client: Client to use for
@@ -557,21 +553,17 @@ class TaskCompletion(object):
         """
         try:
             while True:
-                result = self.__analysis_client.get_completed_with_metadata(
-                    after=after,
-                    before=before)
+                result = self.__analysis_client.get_completed_with_metadata(after=after, before=before)
 
                 data = result["data"]
                 tasks = data["tasks"]
                 if tasks:
                     for task in tasks:
                         yield CompletedTask(
-                            task_uuid=task['task_uuid'],
-                            score=task['score'],
-                            insufficient_task_input_errors=task.get(
-                                'insufficient_task_input_errors'
-                            ),
-                            resume_ts=parse_datetime(data["resume"])
+                            task_uuid=task["task_uuid"],
+                            score=task["score"],
+                            insufficient_task_input_errors=task.get("insufficient_task_input_errors"),
+                            resume_ts=parse_datetime(data["resume"]),
                         )
 
                 # NOTE: Even if no tasks have been returned, the API may still have returned us
@@ -592,12 +584,10 @@ class TaskCompletion(object):
             # attributeError needed in case iteritems is missing (not a dict)
             # let's give it the trace of the original exception, so we know
             # what the specific problem is!
-            future_utils.raise_with_traceback(
-                InvalidAnalysisAPIResponse("Unable to parse response to get_completed()")
-            )
+            future_utils.raise_with_traceback(InvalidAnalysisAPIResponse("Unable to parse response to get_completed()"))
 
 
-class SubmissionTracker(object):
+class SubmissionTracker:
     """
     Helper class to track the state of submissions until they're completed
 
@@ -614,6 +604,7 @@ class SubmissionTracker(object):
     Invocations of the two methods can be interleaved to add new tasks to keep
     track of while others are still waiting to be completed.
     """
+
     def __init__(self, analysis_client, task_completion=None):
         self.__analysis_client = analysis_client
         if not task_completion:
@@ -667,8 +658,7 @@ class SubmissionTracker(object):
         """
         self.__tracked_uuids.add(task_uuid)
         if self.__min_timestamp:
-            self.__min_timestamp = min(
-                self.__min_timestamp, submission_utc_timestamp)
+            self.__min_timestamp = min(self.__min_timestamp, submission_utc_timestamp)
         else:
             self.__min_timestamp = submission_utc_timestamp
 
@@ -705,7 +695,7 @@ class SubmissionTracker(object):
         self.__min_timestamp = before
 
 
-class MockSession(object):
+class MockSession:
     """
     This class acts as a drop-in replacement for the python-requests Session object in cases where
     the client should not use a real session. This is useful in case where
@@ -720,6 +710,7 @@ class MockSession(object):
     NOTE: This is not a drop-in replacement for `requests.Session`. It only implements those parts
     of the Session object's interface that we actually use in the `AnalysisAPIClient` class.
     """
+
     def __init__(self, credentials=None, logger=None):
         """
         :param dict|None credentials: Optional credentials to embed in each API request
@@ -739,7 +730,7 @@ class MockSession(object):
 
         data = {}
         try:
-            data = kwargs.pop('data')
+            data = kwargs.pop("data")
         except KeyError:
             pass
         else:
@@ -749,19 +740,17 @@ class MockSession(object):
 
         if self.__credentials is not None:
             # rewrite GET to POST: see class doc-string
-            if method.upper() == 'GET':
-                method = 'POST'
+            if method.upper() == "GET":
+                method = "POST"
                 try:
-                    params = kwargs.pop('params')
+                    params = kwargs.pop("params")
                 except KeyError:
                     pass  # no GET args to deal with
                 else:
                     if params:
                         data.update(params)
                 if self.__logger:
-                    self.__logger.debug(
-                        "Rewrote GET %s to POST, moved %d GET args", url,
-                        len(params) if params else 0)
+                    self.__logger.debug("Rewrote GET %s to POST, moved %d GET args", url, len(params) if params else 0)
 
             # now embed the credentials
             for key, value in self.__credentials.items():
@@ -778,7 +767,7 @@ class MockSession(object):
         self.__requests_session.close()
 
 
-class AnalysisClientBase(object):
+class AnalysisClientBase:
     """
     A client for the Lastline analysis API.
 
@@ -790,11 +779,12 @@ class AnalysisClientBase(object):
     :param logger: if provided, should be a python logging.Logger object
         or object with similar interface.
     """
-    SUB_APIS = ('analysis', 'management', 'authentication')
 
-    DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
-    DATETIME_MSEC_FMT = DATETIME_FMT + '.%f'
-    DATE_FMT = '%Y-%m-%d'
+    SUB_APIS = ("analysis", "management", "authentication")
+
+    DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
+    DATETIME_MSEC_FMT = DATETIME_FMT + ".%f"
+    DATE_FMT = "%Y-%m-%d"
 
     FORMATS = ["json", "xml", "pdf", "rtf"]
 
@@ -846,7 +836,7 @@ class AnalysisClientBase(object):
             raise InvalidFormat(requested_format)
         num_parts = 2 + len(parts)
         pattern = "/".join(["%s"] * num_parts) + ".%s"
-        params = [self.__base_url, sub_api] + parts + [requested_format]
+        params = [self.__base_url, sub_api, *parts, requested_format]
         return pattern % tuple(params)
 
     def _build_file_download_url(self, sub_api, parts):
@@ -857,13 +847,12 @@ class AnalysisClientBase(object):
             raise InvalidSubApiType(sub_api)
         num_parts = 2 + len(parts)
         pattern = "/".join(["%s"] * num_parts)
-        params = [self.__base_url, sub_api] + parts
+        params = [self.__base_url, sub_api, *parts]
         return pattern % tuple(params)
 
     def _check_file_like(self, f, param_name):
-        if not hasattr(f, 'read'):
-            raise AttributeError("The %s parameter is not a file-like object" %
-                                 param_name)
+        if not hasattr(f, "read"):
+            raise AttributeError(f"The {param_name} parameter is not a file-like object")
 
     def _str_to_bytesio(self, base_str):
         """
@@ -880,88 +869,95 @@ class AnalysisClientBase(object):
             return None
 
         if isinstance(base_str, future_utils.text_type):
-            base_str = base_str.encode('utf-8')
+            base_str = base_str.encode("utf-8")
 
         return io.BytesIO(base_str)
 
-    def submit_exe_hash(self,
-                        md5=None,
-                        sha1=None,
-                        download_ip=None,
-                        download_port=None,
-                        download_url=None,
-                        download_host=None,
-                        download_path=None,
-                        download_agent=None,
-                        download_referer=None,
-                        download_request=None,
-                        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                        bypass_cache=None,
-                        raw=False,
-                        verify=True):
+    def submit_exe_hash(
+        self,
+        md5=None,
+        sha1=None,
+        download_ip=None,
+        download_port=None,
+        download_url=None,
+        download_host=None,
+        download_path=None,
+        download_agent=None,
+        download_referer=None,
+        download_request=None,
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=None,
+        raw=False,
+        verify=True,
+    ):
         """
         Submit a file by hash.
 
         *Deprecated*. Use `submit_file_hash()`
         """
-        return self.submit_file_hash(md5, sha1,
-                        download_ip=download_ip,
-                        download_port=download_port,
-                        download_url=download_url,
-                        download_host=download_host,
-                        download_path=download_path,
-                        download_agent=download_agent,
-                        download_referer=download_referer,
-                        download_request=download_request,
-                        full_report_score=full_report_score,
-                        bypass_cache=bypass_cache,
-                        raw=raw,
-                        verify=verify)
+        return self.submit_file_hash(
+            md5,
+            sha1,
+            download_ip=download_ip,
+            download_port=download_port,
+            download_url=download_url,
+            download_host=download_host,
+            download_path=download_path,
+            download_agent=download_agent,
+            download_referer=download_referer,
+            download_request=download_request,
+            full_report_score=full_report_score,
+            bypass_cache=bypass_cache,
+            raw=raw,
+            verify=verify,
+        )
 
-    def submit_file_hash(self,
-                        md5=None,
-                        sha1=None,
-                        sha256=None,
-                        download_ip=None,
-                        download_port=None,
-                        download_url=None,
-                        download_host=None,
-                        download_path=None,
-                        download_agent=None,
-                        download_referer=None,
-                        download_request=None,
-                        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                        bypass_cache=None,
-                        password=None,
-                        password_candidates=None,
-                        backend=None,
-                        require_file_analysis=True,
-                        mime_type=None,
-                        analysis_timeout=None,
-                        analysis_env=None,
-                        allow_network_traffic=None,
-                        filename=None,
-                        keep_file_dumps=None,
-                        keep_memory_dumps=None,
-                        keep_behavior_log=None,
-                        push_to_portal_account=None,
-                        raw=False,
-                        verify=True,
-                        server_ip=None,
-                        server_port=None,
-                        server_host=None,
-                        client_ip=None,
-                        client_port=None,
-                        is_download=True,
-                        protocol="http",
-                        apk_package_name=None,
-                        report_version=None,
-                        analysis_task_uuid=None,
-                        analysis_engine=None,
-                        task_metadata=None,
-                        priority=None,
-                        bypass_prefilter=None,
-                        fast_analysis=None):
+    def submit_file_hash(
+        self,
+        md5=None,
+        sha1=None,
+        sha256=None,
+        download_ip=None,
+        download_port=None,
+        download_url=None,
+        download_host=None,
+        download_path=None,
+        download_agent=None,
+        download_referer=None,
+        download_request=None,
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=None,
+        password=None,
+        password_candidates=None,
+        backend=None,
+        require_file_analysis=True,
+        mime_type=None,
+        analysis_timeout=None,
+        analysis_env=None,
+        allow_network_traffic=None,
+        filename=None,
+        keep_file_dumps=None,
+        keep_memory_dumps=None,
+        keep_behavior_log=None,
+        push_to_portal_account=None,
+        raw=False,
+        verify=True,
+        server_ip=None,
+        server_port=None,
+        server_host=None,
+        client_ip=None,
+        client_port=None,
+        is_download=True,
+        protocol="http",
+        apk_package_name=None,
+        report_version=None,
+        analysis_task_uuid=None,
+        analysis_engine=None,
+        task_metadata=None,
+        priority=None,
+        bypass_prefilter=None,
+        fast_analysis=None,
+    ):
         """
         Submit a file by hash.
 
@@ -1087,145 +1083,154 @@ class AnalysisClientBase(object):
         # These options require special permissions, so we should not set them
         # if not specified
         if allow_network_traffic is not None:
-            allow_network_traffic = allow_network_traffic and 1 or 0
+            allow_network_traffic = (allow_network_traffic and 1) or 0
         if keep_file_dumps is not None:
-            keep_file_dumps = keep_file_dumps and 1 or 0
+            keep_file_dumps = (keep_file_dumps and 1) or 0
         if keep_memory_dumps is not None:
-            keep_memory_dumps = keep_memory_dumps and 1 or 0
+            keep_memory_dumps = (keep_memory_dumps and 1) or 0
         if keep_behavior_log is not None:
-            keep_behavior_log = keep_behavior_log and 1 or 0
+            keep_behavior_log = (keep_behavior_log and 1) or 0
         if bypass_prefilter is not None:
-            bypass_prefilter = bypass_prefilter and 1 or 0
+            bypass_prefilter = (bypass_prefilter and 1) or 0
         if fast_analysis is not None:
-            fast_analysis = fast_analysis and 1 or 0
-        params = purge_none({
-            "md5": md5,
-            "sha1": sha1,
-            "sha256": sha256,
-            "full_report_score": full_report_score,
-            "bypass_cache": bypass_cache and 1 or None,
-            "password": password,
-            "require_file_analysis": require_file_analysis and 1 or 0,
-            "mime_type": mime_type,
-            "download_ip": download_ip,
-            "download_port": download_port,
-            # analysis-specific options:
-            "analysis_timeout": analysis_timeout or None,
-            "analysis_env": analysis_env,
-            "allow_network_traffic": allow_network_traffic,
-            "filename": filename,
-            "keep_file_dumps": keep_file_dumps,
-            "keep_memory_dumps": keep_memory_dumps,
-            "keep_behavior_log": keep_behavior_log,
-            "push_to_portal_account": push_to_portal_account or None,
-            "server_ip": server_ip,
-            "server_port": server_port,
-            "client_ip": client_ip,
-            "client_port": client_port,
-            "direction": get_direction(is_download),
-            "protocol": protocol,
-            "apk_package_name": apk_package_name,
-            "report_version": report_version,
-            "analysis_task_uuid": analysis_task_uuid,
-            "analysis_engine": analysis_engine,
-            "priority": priority,
-            "bypass_prefilter": bypass_prefilter,
-            "fast_analysis": fast_analysis,
-        })
+            fast_analysis = (fast_analysis and 1) or 0
+        params = purge_none(
+            {
+                "md5": md5,
+                "sha1": sha1,
+                "sha256": sha256,
+                "full_report_score": full_report_score,
+                "bypass_cache": (bypass_cache and 1) or None,
+                "password": password,
+                "require_file_analysis": (require_file_analysis and 1) or 0,
+                "mime_type": mime_type,
+                "download_ip": download_ip,
+                "download_port": download_port,
+                # analysis-specific options:
+                "analysis_timeout": analysis_timeout or None,
+                "analysis_env": analysis_env,
+                "allow_network_traffic": allow_network_traffic,
+                "filename": filename,
+                "keep_file_dumps": keep_file_dumps,
+                "keep_memory_dumps": keep_memory_dumps,
+                "keep_behavior_log": keep_behavior_log,
+                "push_to_portal_account": push_to_portal_account or None,
+                "server_ip": server_ip,
+                "server_port": server_port,
+                "client_ip": client_ip,
+                "client_port": client_port,
+                "direction": get_direction(is_download),
+                "protocol": protocol,
+                "apk_package_name": apk_package_name,
+                "report_version": report_version,
+                "analysis_task_uuid": analysis_task_uuid,
+                "analysis_engine": analysis_engine,
+                "priority": priority,
+                "bypass_prefilter": bypass_prefilter,
+                "fast_analysis": fast_analysis,
+            }
+        )
         # using and-or-trick to convert to a StringIO if it is not None
         # this just wraps it into a file-like object
-        files = purge_none({
-            "download_url": self._str_to_bytesio(download_url),
-            "download_host": self._str_to_bytesio(download_host),
-            "download_path": self._str_to_bytesio(download_path),
-            "download_agent": self._str_to_bytesio(download_agent),
-            "download_referer": self._str_to_bytesio(download_referer),
-            "download_request": self._str_to_bytesio(download_request),
-            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
-            # NOTE: We enforce that the given collection is a unique list (set cannot be
-            # serialized). Further, if we are given an empty collection, we don't bother sending
-            # the json
-            "password_candidates": self._str_to_bytesio(simplejson.dumps(
-                list(set(password_candidates)))) if password_candidates else None,
-        })
-        return self._api_request(url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
+        files = purge_none(
+            {
+                "download_url": self._str_to_bytesio(download_url),
+                "download_host": self._str_to_bytesio(download_host),
+                "download_path": self._str_to_bytesio(download_path),
+                "download_agent": self._str_to_bytesio(download_agent),
+                "download_referer": self._str_to_bytesio(download_referer),
+                "download_request": self._str_to_bytesio(download_request),
+                "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
+                # NOTE: We enforce that the given collection is a unique list (set cannot be
+                # serialized). Further, if we are given an empty collection, we don't bother sending
+                # the json
+                "password_candidates": self._str_to_bytesio(simplejson.dumps(list(set(password_candidates)))) if password_candidates else None,
+            }
+        )
+        return self._api_request(url, params, files=files, post=True, raw=raw, verify=verify)
 
-    def submit_exe_file(self,
-                        file_stream,
-                        download_ip=None,
-                        download_port=None,
-                        download_url=None,
-                        download_host=None,
-                        download_path=None,
-                        download_agent=None,
-                        download_referer=None,
-                        download_request=None,
-                        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                        bypass_cache=None,
-                        delete_after_analysis=False,
-                        raw=False,
-                        verify=True):
+    def submit_exe_file(
+        self,
+        file_stream,
+        download_ip=None,
+        download_port=None,
+        download_url=None,
+        download_host=None,
+        download_path=None,
+        download_agent=None,
+        download_referer=None,
+        download_request=None,
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=None,
+        delete_after_analysis=False,
+        raw=False,
+        verify=True,
+    ):
         """
         Submit a file by uploading it.
 
         *Deprecated*. Use `submit_file()`
         """
-        return self.submit_file(file_stream,
-                        download_ip=download_ip,
-                        download_port=download_port,
-                        download_url=download_url,
-                        download_host=download_host,
-                        download_path=download_path,
-                        download_agent=download_agent,
-                        download_referer=download_referer,
-                        download_request=download_request,
-                        full_report_score=full_report_score,
-                        bypass_cache=bypass_cache,
-                        delete_after_analysis=delete_after_analysis,
-                        raw=raw,
-                        verify=verify)
+        return self.submit_file(
+            file_stream,
+            download_ip=download_ip,
+            download_port=download_port,
+            download_url=download_url,
+            download_host=download_host,
+            download_path=download_path,
+            download_agent=download_agent,
+            download_referer=download_referer,
+            download_request=download_request,
+            full_report_score=full_report_score,
+            bypass_cache=bypass_cache,
+            delete_after_analysis=delete_after_analysis,
+            raw=raw,
+            verify=verify,
+        )
 
-    def submit_file(self, file_stream,
-                    download_ip=None,
-                    download_port=None,
-                    download_url=None,
-                    download_host=None,
-                    download_path=None,
-                    download_agent=None,
-                    download_referer=None,
-                    download_request=None,
-                    full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                    bypass_cache=None,
-                    delete_after_analysis=None,
-                    backend=None,
-                    analysis_timeout=None,
-                    analysis_env=None,
-                    allow_network_traffic=None,
-                    filename=None,
-                    keep_file_dumps=None,
-                    keep_memory_dumps=None,
-                    keep_behavior_log=None,
-                    push_to_portal_account=None,
-                    raw=False,
-                    verify=True,
-                    server_ip=None,
-                    server_port=None,
-                    server_host=None,
-                    client_ip=None,
-                    client_port=None,
-                    is_download=True,
-                    protocol="http",
-                    apk_package_name=None,
-                    password=None,
-                    password_candidates=None,
-                    report_version=None,
-                    analysis_task_uuid=None,
-                    analysis_engine=None,
-                    task_metadata=None,
-                    priority=None,
-                    bypass_prefilter=None,
-                    fast_analysis=None):
+    def submit_file(
+        self,
+        file_stream,
+        download_ip=None,
+        download_port=None,
+        download_url=None,
+        download_host=None,
+        download_path=None,
+        download_agent=None,
+        download_referer=None,
+        download_request=None,
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=None,
+        delete_after_analysis=None,
+        backend=None,
+        analysis_timeout=None,
+        analysis_env=None,
+        allow_network_traffic=None,
+        filename=None,
+        keep_file_dumps=None,
+        keep_memory_dumps=None,
+        keep_behavior_log=None,
+        push_to_portal_account=None,
+        raw=False,
+        verify=True,
+        server_ip=None,
+        server_port=None,
+        server_host=None,
+        client_ip=None,
+        client_port=None,
+        is_download=True,
+        protocol="http",
+        apk_package_name=None,
+        password=None,
+        password_candidates=None,
+        report_version=None,
+        analysis_task_uuid=None,
+        analysis_engine=None,
+        task_metadata=None,
+        priority=None,
+        bypass_prefilter=None,
+        fast_analysis=None,
+    ):
         """
         Submit a file by uploading it.
 
@@ -1338,7 +1343,7 @@ class AnalysisClientBase(object):
         if self.__logger and backend:
             self.__logger.warning("Ignoring deprecated parameter 'backend'")
 
-        if filename is None and hasattr(file_stream, 'name'):
+        if filename is None and hasattr(file_stream, "name"):
             filename = os.path.basename(file_stream.name)
 
         self._check_file_like(file_stream, "file_stream")
@@ -1346,86 +1351,92 @@ class AnalysisClientBase(object):
         # These options require special permissions, so we should not set them
         # if not specified
         if allow_network_traffic is not None:
-            allow_network_traffic = allow_network_traffic and 1 or 0
+            allow_network_traffic = (allow_network_traffic and 1) or 0
         if keep_file_dumps is not None:
-            keep_file_dumps = keep_file_dumps and 1 or 0
+            keep_file_dumps = (keep_file_dumps and 1) or 0
         if keep_memory_dumps is not None:
-            keep_memory_dumps = keep_memory_dumps and 1 or 0
+            keep_memory_dumps = (keep_memory_dumps and 1) or 0
         if keep_behavior_log is not None:
-            keep_behavior_log = keep_behavior_log and 1 or 0
+            keep_behavior_log = (keep_behavior_log and 1) or 0
         if bypass_prefilter is not None:
-            bypass_prefilter = bypass_prefilter and 1 or 0
+            bypass_prefilter = (bypass_prefilter and 1) or 0
         if fast_analysis is not None:
-            fast_analysis = fast_analysis and 1 or 0
-        params = purge_none({
-            "bypass_cache": bypass_cache and 1 or None,
-            "full_report_score": full_report_score,
-            "delete_after_analysis": delete_after_analysis and 1 or 0,
-            "download_ip": download_ip,
-            "download_port": download_port,
-            # analysis-specific options:
-            "analysis_timeout": analysis_timeout or None,
-            "analysis_env": analysis_env,
-            "allow_network_traffic": allow_network_traffic,
-            "filename": filename,
-            "keep_file_dumps": keep_file_dumps,
-            "keep_memory_dumps": keep_memory_dumps,
-            "keep_behavior_log": keep_behavior_log,
-            "push_to_portal_account": push_to_portal_account or None,
-            "server_ip": server_ip,
-            "server_port": server_port,
-            "client_ip": client_ip,
-            "client_port": client_port,
-            "direction": get_direction(is_download),
-            "protocol": protocol,
-            "apk_package_name": apk_package_name,
-            "password": password,
-            "report_version": report_version,
-            "analysis_task_uuid": analysis_task_uuid,
-            "analysis_engine": analysis_engine,
-            "priority": priority,
-            "bypass_prefilter": bypass_prefilter,
-            "fast_analysis": fast_analysis,
-        })
+            fast_analysis = (fast_analysis and 1) or 0
+        params = purge_none(
+            {
+                "bypass_cache": (bypass_cache and 1) or None,
+                "full_report_score": full_report_score,
+                "delete_after_analysis": (delete_after_analysis and 1) or 0,
+                "download_ip": download_ip,
+                "download_port": download_port,
+                # analysis-specific options:
+                "analysis_timeout": analysis_timeout or None,
+                "analysis_env": analysis_env,
+                "allow_network_traffic": allow_network_traffic,
+                "filename": filename,
+                "keep_file_dumps": keep_file_dumps,
+                "keep_memory_dumps": keep_memory_dumps,
+                "keep_behavior_log": keep_behavior_log,
+                "push_to_portal_account": push_to_portal_account or None,
+                "server_ip": server_ip,
+                "server_port": server_port,
+                "client_ip": client_ip,
+                "client_port": client_port,
+                "direction": get_direction(is_download),
+                "protocol": protocol,
+                "apk_package_name": apk_package_name,
+                "password": password,
+                "report_version": report_version,
+                "analysis_task_uuid": analysis_task_uuid,
+                "analysis_engine": analysis_engine,
+                "priority": priority,
+                "bypass_prefilter": bypass_prefilter,
+                "fast_analysis": fast_analysis,
+            }
+        )
 
         # using and-or-trick to convert to a StringIO if it is not None
         # this just wraps it into a file-like object
-        files = purge_none({
-            # If an explicit filename was provided, we can pass it down to
-            # python-requests to use it in the multipart/form-data. This avoids
-            # having python-requests trying to guess the filenam based on stream
-            # attributes.
-            #
-            # The problem with this is that, if the filename is not ASCII, then
-            # this triggers a bug in flask/werkzeug which means the file is
-            # thrown away. Thus, we just force an ASCII name
-            "file": ('dummy-ascii-name-for-file-param', file_stream),
-            "download_url": self._str_to_bytesio(download_url),
-            "download_host": self._str_to_bytesio(download_host),
-            "download_path": self._str_to_bytesio(download_path),
-            "download_agent": self._str_to_bytesio(download_agent),
-            "download_referer": self._str_to_bytesio(download_referer),
-            "download_request": self._str_to_bytesio(download_request),
-            "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
-            # NOTE: We enforce that the given collection is a unique list (set cannot be
-            # serialized). Further, if we are given an empty collection, we don't bother sending
-            # the json
-            "password_candidates": self._str_to_bytesio(simplejson.dumps(
-                list(set(password_candidates)))) if password_candidates else None,
-        })
-        return self._api_request(url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
+        files = purge_none(
+            {
+                # If an explicit filename was provided, we can pass it down to
+                # python-requests to use it in the multipart/form-data. This avoids
+                # having python-requests trying to guess the filenam based on stream
+                # attributes.
+                #
+                # The problem with this is that, if the filename is not ASCII, then
+                # this triggers a bug in flask/werkzeug which means the file is
+                # thrown away. Thus, we just force an ASCII name
+                "file": ("dummy-ascii-name-for-file-param", file_stream),
+                "download_url": self._str_to_bytesio(download_url),
+                "download_host": self._str_to_bytesio(download_host),
+                "download_path": self._str_to_bytesio(download_path),
+                "download_agent": self._str_to_bytesio(download_agent),
+                "download_referer": self._str_to_bytesio(download_referer),
+                "download_request": self._str_to_bytesio(download_request),
+                "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata else None,
+                # NOTE: We enforce that the given collection is a unique list (set cannot be
+                # serialized). Further, if we are given an empty collection, we don't bother sending
+                # the json
+                "password_candidates": self._str_to_bytesio(simplejson.dumps(list(set(password_candidates)))) if password_candidates else None,
+            }
+        )
+        return self._api_request(url, params, files=files, post=True, raw=raw, verify=verify)
 
-    def submit_file_metadata(self, md5, sha1,
-                                   download_ip,
-                                   download_port,
-                                   download_host=None,
-                                   download_path=None,
-                                   download_agent=None,
-                                   download_referer=None,
-                                   download_request=None,
-                                   raw=False,
-                                   verify=True):
+    def submit_file_metadata(
+        self,
+        md5,
+        sha1,
+        download_ip,
+        download_port,
+        download_host=None,
+        download_path=None,
+        download_agent=None,
+        download_referer=None,
+        download_request=None,
+        raw=False,
+        verify=True,
+    ):
         """
         Submit metadata regarding a file download.
 
@@ -1458,12 +1469,7 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_url("analysis", ["submit", "download"])
-        params = {
-            "md5": md5,
-            "sha1": sha1,
-            "download_ip": download_ip,
-            "download_port": download_port
-        }
+        params = {"md5": md5, "sha1": sha1, "download_ip": download_ip, "download_port": download_port}
         # using and-or-trick to convert to a StringIO if it is not None
         # this just wraps it into a file-like object
         files = {
@@ -1471,31 +1477,32 @@ class AnalysisClientBase(object):
             "download_path": self._str_to_bytesio(download_path),
             "download_agent": self._str_to_bytesio(download_agent),
             "download_referer": self._str_to_bytesio(download_referer),
-            "download_request": self._str_to_bytesio(download_request)
+            "download_request": self._str_to_bytesio(download_request),
         }
         purge_none(files)
         purge_none(params)
-        return self._api_request(url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
+        return self._api_request(url, params, files=files, post=True, raw=raw, verify=verify)
 
-    def submit_url(self,
-                   url,
-                   referer=None,
-                   full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                   bypass_cache=None,
-                   backend=None,
-                   analysis_timeout=None,
-                   push_to_portal_account=None,
-                   raw=False,
-                   verify=True,
-                   user_agent=None,
-                   report_version=None,
-                   analysis_task_uuid=None,
-                   analysis_engine=None,
-                   priority=None,
-                   task_metadata=None,
-                   fast_analysis=None,
-                   password_candidates=None):
+    def submit_url(
+        self,
+        url,
+        referer=None,
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=None,
+        backend=None,
+        analysis_timeout=None,
+        push_to_portal_account=None,
+        raw=False,
+        verify=True,
+        user_agent=None,
+        report_version=None,
+        analysis_task_uuid=None,
+        analysis_engine=None,
+        priority=None,
+        task_metadata=None,
+        fast_analysis=None,
+        password_candidates=None,
+    ):
         """
         Submit a url.
 
@@ -1545,47 +1552,49 @@ class AnalysisClientBase(object):
         api_url = self._build_url("analysis", ["submit", "url"])
 
         if fast_analysis is not None:
-            fast_analysis = fast_analysis and 1 or 0
+            fast_analysis = (fast_analysis and 1) or 0
 
-        params = purge_none({
-            "url": url,
-            "referer": referer,
-            "full_report_score": full_report_score,
-            "bypass_cache": bypass_cache and 1 or None,
-            "analysis_timeout": analysis_timeout or None,
-            "push_to_portal_account": push_to_portal_account or None,
-            "user_agent": user_agent or None,
-            "report_version": report_version,
-            "analysis_task_uuid": analysis_task_uuid or None,
-            "analysis_engine": analysis_engine,
-            "priority": priority,
-            "fast_analysis": fast_analysis,
-        })
+        params = purge_none(
+            {
+                "url": url,
+                "referer": referer,
+                "full_report_score": full_report_score,
+                "bypass_cache": (bypass_cache and 1) or None,
+                "analysis_timeout": analysis_timeout or None,
+                "push_to_portal_account": push_to_portal_account or None,
+                "user_agent": user_agent or None,
+                "report_version": report_version,
+                "analysis_task_uuid": analysis_task_uuid or None,
+                "analysis_engine": analysis_engine,
+                "priority": priority,
+                "fast_analysis": fast_analysis,
+            }
+        )
 
-        files = purge_none({
-            "task_metadata": self._str_to_bytesio(
-                simplejson.dumps(task_metadata))
-            if task_metadata is not None else None,
-            # NOTE: We enforce that the given collection is a unique list (set cannot be
-            # serialized). Further, if we are given an empty collection, we don't bother sending
-            # the json
-            "password_candidates": self._str_to_bytesio(simplejson.dumps(
-                list(set(password_candidates)))) if password_candidates else None,
-        })
+        files = purge_none(
+            {
+                "task_metadata": self._str_to_bytesio(simplejson.dumps(task_metadata)) if task_metadata is not None else None,
+                # NOTE: We enforce that the given collection is a unique list (set cannot be
+                # serialized). Further, if we are given an empty collection, we don't bother sending
+                # the json
+                "password_candidates": self._str_to_bytesio(simplejson.dumps(list(set(password_candidates)))) if password_candidates else None,
+            }
+        )
 
-        return self._api_request(api_url, params, files=files, post=True,
-                                 raw=raw, verify=verify)
+        return self._api_request(api_url, params, files=files, post=True, raw=raw, verify=verify)
 
-    def get_result(self,
-                   uuid,
-                   report_uuid=None,
-                   full_report_score=None,
-                   include_scoring_components=None,
-                   raw=False,
-                   requested_format="json",
-                   verify=True,
-                   report_version=None,
-                   allow_datacenter_redirect=None):
+    def get_result(
+        self,
+        uuid,
+        report_uuid=None,
+        full_report_score=None,
+        include_scoring_components=None,
+        raw=False,
+        requested_format="json",
+        verify=True,
+        report_version=None,
+        allow_datacenter_redirect=None,
+    ):
         """
         Get results for a previously submitted analysis task.
 
@@ -1614,33 +1623,30 @@ class AnalysisClientBase(object):
         """
         # better: use 'get_results()' but that would break
         # backwards-compatibility
-        url = self._build_url('analysis', ['get'],
-                               requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'report_uuid': report_uuid,
-            'full_report_score': full_report_score,
-            'include_scoring_components': include_scoring_components and 1 or 0,
-            'report_version': report_version,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
-        if requested_format.lower() != 'json':
+        url = self._build_url("analysis", ["get"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "report_uuid": report_uuid,
+                "full_report_score": full_report_score,
+                "include_scoring_components": (include_scoring_components and 1) or 0,
+                "report_version": report_version,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
+        if requested_format.lower() != "json":
             raw = True
         # NOTE: This API request may return real HTTP status-codes (and errors)
         # directly when fetching IOC reports.
         try:
-            result = self._api_request(url,
-                                       params,
-                                       raw=raw,
-                                       requested_format=requested_format,
-                                       verify=verify)
+            result = self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
         except FailedRequestError as exc:
             status_code = str(exc.status_code())
 
-            if status_code == '404':
+            if status_code == "404":
                 raise InvalidUUIDError(str(exc))
 
-            if status_code == '412':
+            if status_code == "412":
                 raise NoResultFoundError(str(exc))
 
             # we have nothing more specific to say -- raise the
@@ -1655,11 +1661,7 @@ class AnalysisClientBase(object):
 
         return result
 
-    def get_result_summary(self, uuid, raw=False,
-                           requested_format="json",
-                           score_only=False,
-                           verify=True,
-                           allow_datacenter_redirect=None):
+    def get_result_summary(self, uuid, raw=False, requested_format="json", score_only=False, verify=True, allow_datacenter_redirect=None):
         """
         Get result summary for a previously submitted analysis task.
 
@@ -1677,25 +1679,19 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url("analysis", ["get_result"],
-                               requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'score_only': score_only and 1 or 0,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["get_result"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "score_only": (score_only and 1) or 0,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
 
-    def get_result_activities(self, uuid, raw=False,
-                              requested_format="json",
-                              verify=True,
-                              allow_datacenter_redirect=None):
+    def get_result_activities(self, uuid, raw=False, requested_format="json", verify=True, allow_datacenter_redirect=None):
         """
         Get the behavior/activity information for a previously submitted
         analysis task.
@@ -1712,24 +1708,18 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url("analysis", ["get_result_activities"],
-                               requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["get_result_activities"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
 
-    def get_report_activities(self, uuid, report_uuid, raw=False,
-                              requested_format="json",
-                              verify=True,
-                              allow_datacenter_redirect=None):
+    def get_report_activities(self, uuid, report_uuid, raw=False, requested_format="json", verify=True, allow_datacenter_redirect=None):
         """
         Get the behavior/activity information for a specific analysis report.
 
@@ -1747,23 +1737,21 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url("analysis", ["get_report_activities"],
-                               requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'report_uuid': report_uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["get_report_activities"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "report_uuid": report_uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
 
-    def get_result_artifact(self, uuid, report_uuid, artifact_name, password_protected=None,
-                            raw=False, verify=True, allow_datacenter_redirect=None):
+    def get_result_artifact(
+        self, uuid, report_uuid, artifact_name, password_protected=None, raw=False, verify=True, allow_datacenter_redirect=None
+    ):
         """
         Get artifact generated by an analysis result for a previously
         submitted analysis task.
@@ -1787,38 +1775,36 @@ class AnalysisClientBase(object):
         """
         # NOTE: we cannot simply use "get_report_artifact" in this function, because that
         # function does not allow returning JSON/XML formatted data
-        url = self._build_file_download_url("analysis",
-                                             ["get_result_artifact"])
-        params = purge_none({
-            'uuid': uuid,
-            'artifact_uuid': "%s:%s" % (report_uuid, artifact_name),
-            'password_protected': password_protected,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_file_download_url("analysis", ["get_result_artifact"])
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "artifact_uuid": f"{report_uuid}:{artifact_name}",
+                "password_protected": password_protected,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
 
         # NOTE: This API request is completely different because it
         # returns real HTTP status-codes (and errors) directly
         try:
-            result = self._api_request(url, params, requested_format='raw',
-                                       raw=raw, verify=verify)
+            result = self._api_request(url, params, requested_format="raw", raw=raw, verify=verify)
             if not result.len:
                 raise InvalidArtifactError("The artifact is empty")
 
         except FailedRequestError as exc:
             status_code = str(exc.status_code())
 
-            if status_code == '401':
-                raise PermissionDeniedError(
-                    "Permission denied to access artifacts")
+            if status_code == "401":
+                raise PermissionDeniedError("Permission denied to access artifacts")
 
-            if status_code == '404':
+            if status_code == "404":
                 raise InvalidArtifactError(str(exc))
 
-            if status_code == '410':
-                raise InvalidArtifactError(
-                    "The artifact is no longer available")
+            if status_code == "410":
+                raise InvalidArtifactError("The artifact is no longer available")
 
-            if status_code == '412':
+            if status_code == "412":
                 raise InvalidUUIDError(str(exc))
 
             # we have nothing more specific to say -- raise the
@@ -1829,10 +1815,7 @@ class AnalysisClientBase(object):
             raise InvalidArtifactError("The artifact is empty")
         return result
 
-    def get_report_artifact(
-        self, uuid, report_uuid, artifact_name, password_protected=None, verify=True,
-            allow_datacenter_redirect=None
-    ):
+    def get_report_artifact(self, uuid, report_uuid, artifact_name, password_protected=None, verify=True, allow_datacenter_redirect=None):
         """
         Get artifact generated by an analysis result for a previously
         submitted analysis task.
@@ -1853,32 +1836,29 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_file_download_url("analysis", ["get_report_artifact"])
-        params = purge_none({
-            'uuid': uuid,
-            'report_uuid': report_uuid,
-            'artifact_name': artifact_name,
-            'password_protected': password_protected,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "report_uuid": report_uuid,
+                "artifact_name": artifact_name,
+                "password_protected": password_protected,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
 
         # NOTE: This API request is completely different because it
         # returns real HTTP status-codes (and errors) directly
         try:
-            result = self._api_request(
-                url,
-                params,
-                requested_format='raw',
-                raw=True,
-                verify=verify)
+            result = self._api_request(url, params, requested_format="raw", raw=True, verify=verify)
         except FailedRequestError as exc:
             status_code = str(exc.status_code())
-            if status_code == '401':
+            if status_code == "401":
                 raise PermissionDeniedError("Permission denied to access artifacts")
-            if status_code == '404':
+            if status_code == "404":
                 raise InvalidArtifactError(str(exc))
-            if status_code == '410':
+            if status_code == "410":
                 raise InvalidArtifactError("The artifact is no longer available")
-            if status_code == '412':
+            if status_code == "412":
                 raise InvalidUUIDError(str(exc))
             # we have nothing more specific to say -- raise the
             # original FailedRequestError
@@ -1886,8 +1866,7 @@ class AnalysisClientBase(object):
 
         return result
 
-    def query_task_artifact(self, uuid, artifact_name, raw=False, verify=True,
-                            allow_datacenter_redirect=None):
+    def query_task_artifact(self, uuid, artifact_name, raw=False, verify=True, allow_datacenter_redirect=None):
         """
         Query if a specific task artifact is available for download.
 
@@ -1900,18 +1879,16 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_url("analysis", ["query_task_artifact"])
-        params = purge_none({
-            'uuid': uuid,
-            'artifact_name': artifact_name,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "artifact_name": artifact_name,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         return self._api_request(url, params, raw=raw, verify=verify)
 
-    def get_ioc_metadata(self, ioc_uuid,
-                         raw=False,
-                         requested_format="json",
-                         verify=True,
-                         allow_datacenter_redirect=None):
+    def get_ioc_metadata(self, ioc_uuid, raw=False, requested_format="json", verify=True, allow_datacenter_redirect=None):
         """
         Get metadata about a previously generated IOC report by its UUID.
 
@@ -1927,25 +1904,18 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['ioc', 'get_ioc_metadata'],
-                               requested_format=requested_format)
-        params = purge_none({
-            'ioc_uuid': ioc_uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
-        if requested_format.lower() != 'json':
+        url = self._build_url("analysis", ["ioc", "get_ioc_metadata"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "ioc_uuid": ioc_uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
+        if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
 
-    def get_ioc_report(self, ioc_uuid,
-                       raw=False,
-                       requested_format="json",
-                       verify=True,
-                       allow_datacenter_redirect=None):
+    def get_ioc_report(self, ioc_uuid, raw=False, requested_format="json", verify=True, allow_datacenter_redirect=None):
         """
         Get an IOC report by its UUID.
 
@@ -1961,28 +1931,20 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['ioc', 'get_ioc_report'],
-                               requested_format=requested_format)
-        params = purge_none({
-            'ioc_uuid': ioc_uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
-        if requested_format.lower() != 'json':
+        url = self._build_url("analysis", ["ioc", "get_ioc_report"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "ioc_uuid": ioc_uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
+        if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, verify=verify)
 
-    def create_ioc_from_result(self,
-                               uuid,
-                               report_uuid=None,
-                               raw=False,
-                               requested_format="json",
-                               verify=True,
-                               report_version=None,
-                               allow_datacenter_redirect=None):
+    def create_ioc_from_result(
+        self, uuid, report_uuid=None, raw=False, requested_format="json", verify=True, report_version=None, allow_datacenter_redirect=None
+    ):
         """
         Get an IOC report by its UUID.
 
@@ -1999,22 +1961,18 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['ioc', 'create_ioc_from_result'],
-                               requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'report_uuid': report_uuid,
-            'report_version': report_version,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
-        if requested_format.lower() != 'json':
+        url = self._build_url("analysis", ["ioc", "create_ioc_from_result"], requested_format=requested_format)
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "report_uuid": report_uuid,
+                "report_version": report_version,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
+        if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url,
-                                 params,
-                                 raw=raw,
-                                 requested_format=requested_format,
-                                 post=True,
-                                 verify=verify)
+        return self._api_request(url, params, raw=raw, requested_format=requested_format, post=True, verify=verify)
 
     def get_network_iocs(self, uuid, raw=False, verify=True, allow_datacenter_redirect=None):
         """
@@ -2034,34 +1992,31 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url("analysis",  ['ioc', 'get_network_iocs'])
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["ioc", "get_network_iocs"])
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         response = self._api_request(url, params, raw=raw, verify=verify)
         if raw:
             return response
         network_ioc_response = []
         try:
-            for network_ioc in response['data']['network_iocs']:
-                if network_ioc['pcap_info_version'] != self.SUPPORTED_IOC_PCAP_VERSION:
-                    raise InvalidAnalysisAPIResponse('malscape returns invalid pcap_info version')
+            for network_ioc in response["data"]["network_iocs"]:
+                if network_ioc["pcap_info_version"] != self.SUPPORTED_IOC_PCAP_VERSION:
+                    raise InvalidAnalysisAPIResponse("malscape returns invalid pcap_info version")
                 # version and url fields are required for pcap json decoding
-                network_ioc['pcap_info']['version'] = self.SUPPORTED_IOC_PCAP_VERSION
-                if 'urls' not in network_ioc['pcap_info']:
-                    network_ioc['pcap_info']['urls'] = []
+                network_ioc["pcap_info"]["version"] = self.SUPPORTED_IOC_PCAP_VERSION
+                if "urls" not in network_ioc["pcap_info"]:
+                    network_ioc["pcap_info"]["urls"] = []
                 try:
-                    network_ioc_response.append(
-                        llpcap_apiclient.PcapInfoV2.from_json({'data': network_ioc['pcap_info']})
-                    )
+                    network_ioc_response.append(llpcap_apiclient.PcapInfoV2.from_json({"data": network_ioc["pcap_info"]}))
                 except llpcap_apiclient.Error as err:
-                    raise InvalidAnalysisAPIResponse(
-                        'malscape returns invalid network_ioc response: {}'.format(err))
+                    raise InvalidAnalysisAPIResponse(f"malscape returns invalid network_ioc response: {err}")
         except KeyError as err:
-            raise InvalidAnalysisAPIResponse(
-                'malscape returns invalid network_ioc response: missing field {}'.format(err)
-            )
+            raise InvalidAnalysisAPIResponse(f"malscape returns invalid network_ioc response: missing field {err}")
 
         return network_ioc_response
 
@@ -2069,11 +2024,9 @@ class AnalysisClientBase(object):
         """
         *Deprecated*. Use 'get_completed()'
         """
-        return self.get_completed(after, before=before,
-                                  verify=verify, raw=raw)
+        return self.get_completed(after, before=before, verify=verify, raw=raw)
 
-    def get_completed(self, after, before=None, raw=False, verify=True,
-                      include_score=False):
+    def get_completed(self, after, before=None, raw=False, verify=True, include_score=False):
         """
         Get the list of uuids of tasks that were completed
         within a given time frame.
@@ -2108,11 +2061,13 @@ class AnalysisClientBase(object):
             before = before.strftime(AnalysisClientBase.DATETIME_FMT)
         if hasattr(after, "strftime"):
             after = after.strftime(AnalysisClientBase.DATETIME_FMT)
-        params = purge_none({
-            'before': before,
-            'after': after,
-            'include_score': include_score and 1 or 0,
-        })
+        params = purge_none(
+            {
+                "before": before,
+                "after": after,
+                "include_score": (include_score and 1) or 0,
+            }
+        )
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def get_completed_with_metadata(self, after, before=None, raw=False, verify=True):
@@ -2146,10 +2101,12 @@ class AnalysisClientBase(object):
             before = before.strftime(AnalysisClientBase.DATETIME_FMT)
         if hasattr(after, "strftime"):
             after = after.strftime(AnalysisClientBase.DATETIME_FMT)
-        params = purge_none({
-            'before': before,
-            'after': after,
-        })
+        params = purge_none(
+            {
+                "before": before,
+                "after": after,
+            }
+        )
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def get_pending(self, after=None, before=None, raw=False, verify=True):
@@ -2186,7 +2143,7 @@ class AnalysisClientBase(object):
             before = before.strftime(AnalysisClientBase.DATETIME_FMT)
         if hasattr(after, "strftime"):
             after = after.strftime(AnalysisClientBase.DATETIME_FMT)
-        params = purge_none({'before': before, 'after': after})
+        params = purge_none({"before": before, "after": after})
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def get_progress(self, uuid, raw=False, allow_datacenter_redirect=None):
@@ -2204,11 +2161,13 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['get_progress'])
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["get_progress"])
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
     def get_task_metadata(self, uuid, raw=False, allow_datacenter_redirect=None):
@@ -2226,14 +2185,16 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['get_task_metadata'])
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["get_task_metadata"])
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         return self._api_request(url, params, raw=raw)
 
-    def export_report(self, uuid, report_type, report_format='PDF', raw=False):
+    def export_report(self, uuid, report_type, report_format="PDF", raw=False):
         """
         Export a report or a combination of reports for a task.
 
@@ -2254,12 +2215,14 @@ class AnalysisClientBase(object):
             raise Error("Invalid report type")
         if report_format not in ANALYSIS_API_EXPORT_REPORT_FORMATS:
             raise Error("Invalid report format")
-        url = self._build_url('analysis', ['export_report'])
-        params = purge_none({
-            'uuid': uuid,
-            'report_type': report_type,
-            'report_format': report_format,
-        })
+        url = self._build_url("analysis", ["export_report"])
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "report_type": report_type,
+                "report_format": report_format,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
     def get_completed_exported_reports(self, resume_after_report_uuid=None, raw=False):
@@ -2276,10 +2239,12 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['get_completed_exported_reports'])
-        params = purge_none({
-            'resume_after_report_uuid': resume_after_report_uuid,
-        })
+        url = self._build_url("analysis", ["get_completed_exported_reports"])
+        params = purge_none(
+            {
+                "resume_after_report_uuid": resume_after_report_uuid,
+            }
+        )
         return self._api_request(url, params, raw=raw)
 
     def get_exported_report(self, exported_report_uuid):
@@ -2295,33 +2260,29 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code.
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_file_download_url('analysis', ['get_exported_report'])
-        params = purge_none({
-            'exported_report_uuid': exported_report_uuid,
-            'cdn': self.__use_cdn
-        })
+        url = self._build_file_download_url("analysis", ["get_exported_report"])
+        params = purge_none({"exported_report_uuid": exported_report_uuid, "cdn": self.__use_cdn})
         # NOTE: This API request returns real HTTP status-codes (and errors) directly
         try:
-            response = self._api_request(url, params, raw=True, requested_format='raw')
+            response = self._api_request(url, params, raw=True, requested_format="raw")
             if isinstance(response, bytes):
                 response = io.BytesIO(response)
             return response
         except FailedRequestError as exc:
             status_code = str(exc.status_code())
-            if status_code == '401':
+            if status_code == "401":
                 raise PermissionDeniedError("Permission denied to access artifacts")
-            if status_code == '404':
+            if status_code == "404":
                 raise InvalidArtifactError(str(exc))
-            if status_code == '410':
+            if status_code == "410":
                 raise InvalidArtifactError("The artifact is no longer available")
-            if status_code == '412':
+            if status_code == "412":
                 raise InvalidUUIDError(str(exc))
             # we have nothing more specific to say -- raise the
             # original FailedRequestError
             raise
 
-    def query_file_hash(self, hash_value=None, algorithm=None, block_size=None,
-                        md5=None, sha1=None, sha256=None, mmh3=None, raw=False):
+    def query_file_hash(self, hash_value=None, algorithm=None, block_size=None, md5=None, sha1=None, sha256=None, mmh3=None, raw=False):
         """
         Search for existing analysis results with the given file-hash.
 
@@ -2339,42 +2300,40 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        if (mmh3 or (algorithm and algorithm.lower() == 'mmh3')) and self.__logger:
-            self.__logger.warning(
-                "No results will be returned for deprecated mmh3 file-hash query"
-            )
+        if (mmh3 or (algorithm and algorithm.lower() == "mmh3")) and self.__logger:
+            self.__logger.warning("No results will be returned for deprecated mmh3 file-hash query")
 
         if md5 or sha1 or sha256 or mmh3:
             if hash_value or algorithm:
                 raise TypeError("Conflicting values passed for hash/algorithm")
             if md5 and not sha1 and not sha256 and not mmh3:
                 hash_value = md5
-                algorithm = 'md5'
+                algorithm = "md5"
             elif sha1 and not md5 and not sha256 and not mmh3:
                 hash_value = sha1
-                algorithm = 'sha1'
+                algorithm = "sha1"
             elif sha256 and not md5 and not sha1 and not mmh3:
                 hash_value = sha256
-                algorithm = 'sha256'
+                algorithm = "sha256"
             elif mmh3 and not md5 and not sha1 and not sha256:
                 hash_value = mmh3
-                algorithm = 'mmh3'
+                algorithm = "mmh3"
             else:
                 raise TypeError("Conflicting values passed for hash/algorithm")
         elif not hash_value or not algorithm:
             raise TypeError("Missing values for hash_value/algorithm")
 
-        url = self._build_url('analysis', ['query/file_hash'])
-        params = purge_none({
-            'hash_value': hash_value,
-            'hash_algorithm': algorithm,
-            'hash_block_size': block_size,
-        })
+        url = self._build_url("analysis", ["query/file_hash"])
+        params = purge_none(
+            {
+                "hash_value": hash_value,
+                "hash_algorithm": algorithm,
+                "hash_block_size": block_size,
+            }
+        )
         return self._api_request(url, params, raw=raw)
 
-    def is_blocked_file_hash(self, hash_value=None, algorithm=None,
-                             block_size=None, md5=None, sha1=None, sha256=None,
-                             mmh3=None, raw=False):
+    def is_blocked_file_hash(self, hash_value=None, algorithm=None, block_size=None, md5=None, sha1=None, sha256=None, mmh3=None, raw=False):
         """
         Check if the given file-hash belongs to a malicious file and we have
         gathered enough information to block based on this (partial) hash.
@@ -2392,41 +2351,40 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        if (mmh3 or (algorithm and algorithm.lower() == 'mmh3')) and self.__logger:
-            self.__logger.warning(
-                "No results will be returned for deprecated mmh3 file-hash query"
-            )
+        if (mmh3 or (algorithm and algorithm.lower() == "mmh3")) and self.__logger:
+            self.__logger.warning("No results will be returned for deprecated mmh3 file-hash query")
 
         if md5 or sha1 or sha256 or mmh3:
             if hash_value or algorithm:
                 raise TypeError("Conflicting values passed for hash/algorithm")
             if md5 and not sha1 and not sha256 and not mmh3:
                 hash_value = md5
-                algorithm = 'md5'
+                algorithm = "md5"
             elif sha1 and not md5 and not sha256 and not mmh3:
                 hash_value = sha1
-                algorithm = 'sha1'
+                algorithm = "sha1"
             elif sha256 and not md5 and not sha1 and not mmh3:
                 hash_value = sha256
-                algorithm = 'sha256'
+                algorithm = "sha256"
             elif mmh3 and not md5 and not sha1 and not sha256:
                 hash_value = mmh3
-                algorithm = 'mmh3'
+                algorithm = "mmh3"
             else:
                 raise TypeError("Conflicting values passed for hash/algorithm")
         elif not hash_value or not algorithm:
             raise TypeError("Missing values for hash_value/algorithm")
 
-        url = self._build_url('analysis', ['query/is_blocked_file_hash'])
-        params = purge_none({
-            'hash_value': hash_value,
-            'hash_algorithm': algorithm,
-            'hash_block_size': block_size,
-        })
+        url = self._build_url("analysis", ["query/is_blocked_file_hash"])
+        params = purge_none(
+            {
+                "hash_value": hash_value,
+                "hash_algorithm": algorithm,
+                "hash_block_size": block_size,
+            }
+        )
         return self._api_request(url, params, raw=raw)
 
-    def query_analysis_engine_tasks(self, analysis_engine_task_uuids,
-                                    analysis_engine='analyst', raw=False):
+    def query_analysis_engine_tasks(self, analysis_engine_task_uuids, analysis_engine="analyst", raw=False):
         """
         Provide a set of task UUIDs from an analysis engine (such as Analyst
         Scheduler) and find completed tasks that contain this analysis
@@ -2434,19 +2392,24 @@ class AnalysisClientBase(object):
 
         THIS FUNCTION IS DEPRECATED - DO NOT USE!
         """
-        url = self._build_url('analysis', ['query/analysis_engine_tasks'])
-        params = purge_none({
-            'analysis_engine_task_uuids': ','.join(analysis_engine_task_uuids),
-            'analysis_engine': analysis_engine,
-        })
+        url = self._build_url("analysis", ["query/analysis_engine_tasks"])
+        params = purge_none(
+            {
+                "analysis_engine_task_uuids": ",".join(analysis_engine_task_uuids),
+                "analysis_engine": analysis_engine,
+            }
+        )
         return self._api_request(url, params, raw=raw)
 
-    def analyze_sandbox_result(self, analysis_task_uuid,
-                               analysis_engine='anubis',
-                               full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                               bypass_cache=False,
-                               raw=False,
-                               allow_datacenter_redirect=None):
+    def analyze_sandbox_result(
+        self,
+        analysis_task_uuid,
+        analysis_engine="anubis",
+        full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
+        bypass_cache=False,
+        raw=False,
+        allow_datacenter_redirect=None,
+    ):
         """
         Provide a task UUID from an analysis engine (such as Analyst Scheduler)
         and trigger scoring of the activity captured by the analysis
@@ -2476,14 +2439,16 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('analysis', ['analyze_sandbox_result'])
-        params = purge_none({
-            'analysis_task_uuid': analysis_task_uuid,
-            'analysis_engine': analysis_engine,
-            'full_report_score': full_report_score,
-            'bypass_cache': bypass_cache and 1 or 0,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        url = self._build_url("analysis", ["analyze_sandbox_result"])
+        params = purge_none(
+            {
+                "analysis_task_uuid": analysis_task_uuid,
+                "analysis_engine": analysis_engine,
+                "full_report_score": full_report_score,
+                "bypass_cache": (bypass_cache and 1) or 0,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         purge_none(params)
         return self._api_request(url, params, raw=raw)
 
@@ -2505,14 +2470,15 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_url("analysis", ["register_completion"])
-        params = purge_none({
-            'uuid': uuid,
-            'force_register': force_register and 1 or 0,
-        })
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "force_register": (force_register and 1) or 0,
+            }
+        )
         return self._api_request(url, params, post=True, raw=raw)
 
-    def get_analysis_tags(self, uuid, raw=False, verify=True, allow_datacenter_redirect=None,
-                          requested_format="json"):
+    def get_analysis_tags(self, uuid, raw=False, verify=True, allow_datacenter_redirect=None, requested_format="json"):
         """
         Get the analysis tags for an analysis task.
 
@@ -2533,17 +2499,17 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_url("analysis", ["get_analysis_tags"], requested_format=requested_format)
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
-        if requested_format.lower() != 'json':
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
+        if requested_format.lower() != "json":
             raw = True
-        return self._api_request(url, params, raw=raw, verify=verify,
-                                 requested_format=requested_format)
+        return self._api_request(url, params, raw=raw, verify=verify, requested_format=requested_format)
 
-    def get_child_tasks_recursively(self, uuid, raw=False, verify=True,
-                                    allow_datacenter_redirect=None):
+    def get_child_tasks_recursively(self, uuid, raw=False, verify=True, allow_datacenter_redirect=None):
         """
         Get all the child tasks recursively for the given task UUID.
 
@@ -2572,15 +2538,25 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         url = self._build_url("analysis", ["get_child_tasks_recursively"])
-        params = purge_none({
-            'uuid': uuid,
-            'allow_datacenter_redirect': allow_datacenter_redirect,
-        })
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "allow_datacenter_redirect": allow_datacenter_redirect,
+            }
+        )
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def update_global_whitelist_info(
-        self, uploader_name, create_uploader=False, md5=None, sha1=None, sha256=None,
-        confidence=None, is_revoked=False, is_public=False, raw=False
+        self,
+        uploader_name,
+        create_uploader=False,
+        md5=None,
+        sha1=None,
+        sha256=None,
+        confidence=None,
+        is_revoked=False,
+        is_public=False,
+        raw=False,
     ):
         """
         Update global whitelist database with file information
@@ -2609,23 +2585,23 @@ class AnalysisClientBase(object):
         """
         assert md5 or sha1 or sha256, "Need to provide one of md5/sha1/sha256"
 
-        url = self._build_url('management', ['update_global_whitelist_info'])
-        params = purge_none({
-            'uploader_name': uploader_name,
-            'create_uploader': create_uploader,
-            'md5': md5,
-            'sha1': sha1,
-            'sha256': sha256,
-            'confidence': confidence,
-            'is_revoked': is_revoked,
-            'is_public': is_public
-        })
+        url = self._build_url("management", ["update_global_whitelist_info"])
+        params = purge_none(
+            {
+                "uploader_name": uploader_name,
+                "create_uploader": create_uploader,
+                "md5": md5,
+                "sha1": sha1,
+                "sha256": sha256,
+                "confidence": confidence,
+                "is_revoked": is_revoked,
+                "is_public": is_public,
+            }
+        )
 
         return self._api_request(url, params, post=True, raw=raw)
 
-    def add_untrusted_signer(
-        self, signer_name, reputation, regexp_common_name=None, regexp_company_name=None, raw=False
-    ):
+    def add_untrusted_signer(self, signer_name, reputation, regexp_common_name=None, regexp_company_name=None, raw=False):
         """
         Add untrusted signer information with negative reputation to database
 
@@ -2638,23 +2614,24 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['add_untrusted_signer'])
+        url = self._build_url("management", ["add_untrusted_signer"])
 
         if not (-100 <= reputation < 0):
             raise Error("Invalid reputation value")
 
-        params = purge_none({
-            'signer_name': signer_name,
-            'regexp_common_name': regexp_common_name,
-            'reputation': reputation,
-            'regexp_company_name': regexp_company_name
-        })
+        params = purge_none(
+            {
+                "signer_name": signer_name,
+                "regexp_common_name": regexp_common_name,
+                "reputation": reputation,
+                "regexp_company_name": regexp_company_name,
+            }
+        )
 
         return self._api_request(url, params, post=True, raw=raw)
 
     def add_trusted_signer(
-        self, signer_name, reputation, file_stream, hash_type='sha1',
-        regexp_common_name=None, regexp_company_name=None, raw=False
+        self, signer_name, reputation, file_stream, hash_type="sha1", regexp_common_name=None, regexp_company_name=None, raw=False
     ):
         """
         Adding trusted signer fingerprint to the database
@@ -2671,23 +2648,25 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['add_trusted_signer'])
+        url = self._build_url("management", ["add_trusted_signer"])
 
         if not (0 <= reputation <= 100):
             raise Error("Invalid reputation value")
 
-        if hash_type not in frozenset(['md5', 'sha1']):
-            raise Error("Invalid hash type: {}".format(hash_type))
+        if hash_type not in frozenset(["md5", "sha1"]):
+            raise Error(f"Invalid hash type: {hash_type}")
 
-        params = purge_none({
-            'signer_name': signer_name,
-            'reputation': reputation,
-            'regexp_common_name': regexp_common_name,
-            'regexp_company_name': regexp_company_name,
-            'hash_type': hash_type
-        })
+        params = purge_none(
+            {
+                "signer_name": signer_name,
+                "reputation": reputation,
+                "regexp_common_name": regexp_common_name,
+                "regexp_company_name": regexp_company_name,
+                "hash_type": hash_type,
+            }
+        )
 
-        files = {"file": ('file', file_stream)}
+        files = {"file": ("file", file_stream)}
 
         return self._api_request(url, params, files=files, post=True, raw=raw)
 
@@ -2701,7 +2680,7 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['remove_signer_fingerprint'])
+        url = self._build_url("management", ["remove_signer_fingerprint"])
 
         if not md5_fingerprint and not sha1_fingerprint:
             raise Error("Please provide either md5 or sha1 fingerprint")
@@ -2709,10 +2688,7 @@ class AnalysisClientBase(object):
         if md5_fingerprint and sha1_fingerprint:
             raise Error("Please don't provide both md5 and sha1 fingerprint")
 
-        params = purge_none({
-            'md5_fingerprint': md5_fingerprint,
-            'sha1_fingerprint': sha1_fingerprint
-        })
+        params = purge_none({"md5_fingerprint": md5_fingerprint, "sha1_fingerprint": sha1_fingerprint})
 
         return self._api_request(url, params, post=True, raw=raw)
 
@@ -2725,17 +2701,15 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['remove_signer'])
+        url = self._build_url("management", ["remove_signer"])
 
         assert signer_name, "Signer name cannot be empty"
 
-        params = {'signer_name': signer_name}
+        params = {"signer_name": signer_name}
 
         return self._api_request(url, params, post=True, raw=raw)
 
-    def get_mitre_attack_info(
-        self, mitre_technique_ids=None, mitre_tactic_ids=None, raw=False, verify=True
-    ):
+    def get_mitre_attack_info(self, mitre_technique_ids=None, mitre_tactic_ids=None, raw=False, verify=True):
         """
         From a list of mitre technique or tactic ids, get the information for each ID passed in
 
@@ -2783,17 +2757,21 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        assert mitre_technique_ids or mitre_tactic_ids, 'Missing mitre_technique and tactics ids'
+        assert mitre_technique_ids or mitre_tactic_ids, "Missing mitre_technique and tactics ids"
         url = self._build_url("analysis", ["get_mitre_attack_info"])
         params = {}
         if mitre_technique_ids:
-            params['mitre_technique_ids'] = ','.join(mitre_technique_ids)
+            params["mitre_technique_ids"] = ",".join(mitre_technique_ids)
         if mitre_tactic_ids:
-            params['mitre_tactic_ids'] = ','.join(mitre_tactic_ids)
+            params["mitre_tactic_ids"] = ",".join(mitre_tactic_ids)
         return self._api_request(url, params, raw=raw, verify=verify)
 
     def add_av_detection_score(
-        self, av_product_name, llfile_class_name, av_class_name=None, av_family_name=None,
+        self,
+        av_product_name,
+        llfile_class_name,
+        av_class_name=None,
+        av_family_name=None,
         score=None,
     ):
         """
@@ -2831,23 +2809,23 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['add_av_detection_score'])
+        url = self._build_url("management", ["add_av_detection_score"])
 
         if score is not None and not (0 <= score <= 100):
             raise Error("Invalid score value")
 
-        params = purge_none({
-            'av_product_name': av_product_name,
-            'llfile_class_name': llfile_class_name,
-            'av_class_name': av_class_name,
-            'av_family_name': av_family_name,
-            'score': score
-        })
+        params = purge_none(
+            {
+                "av_product_name": av_product_name,
+                "llfile_class_name": llfile_class_name,
+                "av_class_name": av_class_name,
+                "av_family_name": av_family_name,
+                "score": score,
+            }
+        )
         return self._api_request(url, params, post=True)
 
-    def delete_av_detection_score(
-        self, av_product_name, llfile_class_name, av_class_name=None, av_family_name=None
-    ):
+    def delete_av_detection_score(self, av_product_name, llfile_class_name, av_class_name=None, av_family_name=None):
         """
         Remove an av detection score suppressor entry in the DB
 
@@ -2878,25 +2856,19 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['delete_av_detection_score'])
+        url = self._build_url("management", ["delete_av_detection_score"])
 
-        params = purge_none({
-            'av_product_name': av_product_name,
-            'llfile_class_name': llfile_class_name,
-            'av_class_name': av_class_name,
-            'av_family_name': av_family_name,
-        })
+        params = purge_none(
+            {
+                "av_product_name": av_product_name,
+                "llfile_class_name": llfile_class_name,
+                "av_class_name": av_class_name,
+                "av_family_name": av_family_name,
+            }
+        )
         return self._api_request(url, params, post=True)
 
-    def _api_request(self,
-                     url,
-                     params=None,
-                     files=None,
-                     timeout=None,
-                     post=False,
-                     raw=False,
-                     requested_format="json",
-                     verify=True):
+    def _api_request(self, url, params=None, files=None, timeout=None, post=False, raw=False, requested_format="json", verify=True):
         """
         Send an API request and return the results.
 
@@ -2909,42 +2881,48 @@ class AnalysisClientBase(object):
         :param requested_format: JSON or XML. If format is not JSON, this implies `raw`.
         :param verify: if True, verify ssl, otherwise False
         """
-        raise NotImplementedError("%s does not implement api_request()" % self.__class__.__name__)
+        raise NotImplementedError(f"{self.__class__.__name__} does not implement api_request()")
 
     def _process_response_page(self, page, raw, requested_format, disposition=None):
         """
         Helper for formatting/processing api response before returning it.
         """
         if raw or requested_format.lower() != "json":
-
             # Handle special dispositions
             if disposition:
-                disp_type = disposition.get('type')
-                disp_params = disposition.get('params')
+                disp_type = disposition.get("type")
+                disp_params = disposition.get("params")
 
-                if disp_type == 'attachment':
-                    return NamedStringIO(page, name=disp_params.get('filename'))
+                if disp_type == "attachment":
+                    return NamedStringIO(page, name=disp_params.get("filename"))
 
             return page
 
         # why does pylint think result is a bool??
         # pylint: disable=E1103
         result = simplejson.loads(page)
-        success = result['success']
+        success = result["success"]
         if success:
             return result
 
-        error_code = result.get('error_code', None)
+        error_code = result.get("error_code", None)
         # raise the most specific error we can
         exception_class = AnalysisClientBase.ERRORS.get(error_code, AnalysisAPIError)
-        raise exception_class(result['error'], error_code)
+        raise exception_class(result["error"], error_code)
 
-    def rescore_task(self, md5, sha1,
-                     min_score=0, max_score=100,
-                     threat=None, threat_class=None,
-                     uploader_name='malscape-rescoring',
-                     create_uploader=False,
-                     force_local=False, raw=False):
+    def rescore_task(
+        self,
+        md5,
+        sha1,
+        min_score=0,
+        max_score=100,
+        threat=None,
+        threat_class=None,
+        uploader_name="malscape-rescoring",
+        create_uploader=False,
+        force_local=False,
+        raw=False,
+    ):
         """
         Enforce re-scoring of a specific file based on the
         submitted file's md5/sha1 hash. Requires specific permissions.
@@ -2972,19 +2950,21 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         assert md5 and sha1, "Please provide md5 and sha1"
-        url = self._build_url('management', ['rescore'])
-        params = purge_none({
-            'md5': md5,
-            'sha1': sha1,
-            'min_score': min_score,
-            'max_score': max_score,
-            'threat': threat,
-            'threat_class': threat_class,
-            'uploader_name': uploader_name,
-            'create_uploader': create_uploader,
-            # use the default if no force is set
-            'force_local': force_local and 1 or None,
-        })
+        url = self._build_url("management", ["rescore"])
+        params = purge_none(
+            {
+                "md5": md5,
+                "sha1": sha1,
+                "min_score": min_score,
+                "max_score": max_score,
+                "threat": threat,
+                "threat_class": threat_class,
+                "uploader_name": uploader_name,
+                "create_uploader": create_uploader,
+                # use the default if no force is set
+                "force_local": (force_local and 1) or None,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
     def rescore_backend_task(self, report_uuid, score=None, reputation=None, raw=False):
@@ -3007,20 +2987,31 @@ class AnalysisClientBase(object):
         assert report_uuid is not None, "Please provide report_uuid"
         assert score is None or reputation is None, "Please provide only ONE of score/reputation"
 
-        url = self._build_url('management', ['rescore_backend'])
-        params = purge_none({
-            'report_uuid': report_uuid,
-            'score': score,
-            'reputation': reputation,
-        })
+        url = self._build_url("management", ["rescore_backend"])
+        params = purge_none(
+            {
+                "report_uuid": report_uuid,
+                "score": score,
+                "reputation": reputation,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
-    def rescore_scanner(self, scanner, after, before,
-                         min_score=0, max_score=100,
-                         min_scanner_score=0, max_scanner_score=100,
-                         min_version=0, max_version=None,
-                         test_flag=None, force=False,
-                         raw=False):
+    def rescore_scanner(
+        self,
+        scanner,
+        after,
+        before,
+        min_score=0,
+        max_score=100,
+        min_scanner_score=0,
+        max_scanner_score=100,
+        min_version=0,
+        max_version=None,
+        test_flag=None,
+        force=False,
+        raw=False,
+    ):
         """
         Find tasks that triggered a certain scanner and mark them for
         reprocessing.
@@ -3054,22 +3045,24 @@ class AnalysisClientBase(object):
         if hasattr(after, "strftime"):
             after = after.strftime(AnalysisClientBase.DATETIME_FMT)
 
-        url = self._build_url('management', ['rescore_scanner'])
-        params = purge_none({
-            'scanner': scanner,
-            'after': after,
-            'before': before,
-            'min_score': min_score,
-            'max_score': max_score,
-            'min_scanner_score': min_scanner_score,
-            'max_scanner_score': max_scanner_score,
-            'min_version': min_version,
-            'max_version': max_version,
-        })
+        url = self._build_url("management", ["rescore_scanner"])
+        params = purge_none(
+            {
+                "scanner": scanner,
+                "after": after,
+                "before": before,
+                "min_score": min_score,
+                "max_score": max_score,
+                "min_scanner_score": min_scanner_score,
+                "max_scanner_score": max_scanner_score,
+                "min_version": min_version,
+                "max_version": max_version,
+            }
+        )
         if test_flag is not None:
-            params['test_flag'] = test_flag and 1 or 0
+            params["test_flag"] = (test_flag and 1) or 0
         if force:
-            params['force'] = 1
+            params["force"] = 1
         return self._api_request(url, params, raw=raw, post=True)
 
     def suppress_scanner(self, scanner, max_version, raw=False):
@@ -3083,18 +3076,32 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        url = self._build_url('management', ['suppress_scanner'])
-        params = purge_none({
-            'scanner': scanner,
-            'max_version': max_version,
-        })
+        url = self._build_url("management", ["suppress_scanner"])
+        params = purge_none(
+            {
+                "scanner": scanner,
+                "max_version": max_version,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
-    def create_ticket(self, uuid=None, md5=None, sha1=None,
-                      min_score=0, max_score=100, summary=None, labels=None,
-                      is_false_negative=False, is_false_positive=False,
-                      is_from_customer=False, is_from_partner=False,
-                      is_falses_ml=False, force=True, raw=False):
+    def create_ticket(
+        self,
+        uuid=None,
+        md5=None,
+        sha1=None,
+        min_score=0,
+        max_score=100,
+        summary=None,
+        labels=None,
+        is_false_negative=False,
+        is_false_positive=False,
+        is_from_customer=False,
+        is_from_partner=False,
+        is_falses_ml=False,
+        force=True,
+        raw=False,
+    ):
         """
         Create an ANREV ticket for a specific task or multiple tasks based on
         the submitted file. Requires specific permissions.
@@ -3151,39 +3158,40 @@ class AnalysisClientBase(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         assert uuid or md5 or sha1, "Please provide task-uuid/md5/sha1"
-        url = self._build_url('management', ['create_ticket'])
+        url = self._build_url("management", ["create_ticket"])
         if labels:
             labels = set(labels)
         else:
             labels = set()
         if is_false_negative:
-            labels.add('false_negatives')
+            labels.add("false_negatives")
         if is_false_positive:
-            labels.add('false_positives')
+            labels.add("false_positives")
         if is_from_customer:
-            labels.add('from-customer')
+            labels.add("from-customer")
         if is_from_partner:
-            labels.add('from-partner')
+            labels.add("from-partner")
         if is_falses_ml:
-            labels.add('falses-ml')
+            labels.add("falses-ml")
         if labels:
-            labels_list = ','.join(labels)
+            labels_list = ",".join(labels)
         else:
             labels_list = None
-        params = purge_none({
-            'uuid': uuid,
-            'md5': md5,
-            'sha1': sha1,
-            'min_score': min_score,
-            'max_score': max_score,
-            'force': force and 1 or 0,
-            'summary': summary,
-            'labels': labels_list,
-        })
+        params = purge_none(
+            {
+                "uuid": uuid,
+                "md5": md5,
+                "sha1": sha1,
+                "min_score": min_score,
+                "max_score": max_score,
+                "force": (force and 1) or 0,
+                "summary": summary,
+                "labels": labels_list,
+            }
+        )
         return self._api_request(url, params, raw=raw, post=True)
 
-    def get_license_activity(self, query_start=None, query_end=None,
-                             raw=False):
+    def get_license_activity(self, query_start=None, query_end=None, raw=False):
         """
         Fetch license activity information.
 
@@ -3201,10 +3209,8 @@ class AnalysisClientBase(object):
         :raises AnalysisAPIError: Analysis API returns HTTP error or error code (and 'raw' not set)
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
-        start_info = self.get_completed(
-            after='2039-12-31 23:59:59'
-        )
-        return parse_datetime(start_info['data']['before'])
+        start_info = self.get_completed(after="2039-12-31 23:59:59")
+        return parse_datetime(start_info["data"]["before"])
 
     def get_status(self):
         """
@@ -3217,23 +3223,17 @@ class AnalysisClientBase(object):
                     something is not correct (0) in malscape
             }
         """
-        url = self._build_url('management', ['get_status'])
+        url = self._build_url("management", ["get_status"])
         return self._api_request(url)
 
     def ping(self, raw=False, verify=True):
         """
         Check if base API responds.
         """
-        url = self._build_url('authentication', ['ping'])
+        url = self._build_url("authentication", ["ping"])
         return self._api_request(url, raw=raw, verify=verify)
 
-    def is_risky_analysis_artifact(self,
-                                   report_uuid,
-                                   artifact_name,
-                                   task_uuid=None,
-                                   raw=False,
-                                   verify=True,
-                                   allow_datacenter_redirect=None):
+    def is_risky_analysis_artifact(self, report_uuid, artifact_name, task_uuid=None, raw=False, verify=True, allow_datacenter_redirect=None):
         """
         Check if the artifact can potentially be malicious using the artifact information.
 
@@ -3253,12 +3253,14 @@ class AnalysisClientBase(object):
         """
 
         if report_uuid and artifact_name:
-            params = purge_none({
-                'artifact_uuid': "{}:{}".format(report_uuid, artifact_name),
-                'uuid': task_uuid,
-                'allow_datacenter_redirect': allow_datacenter_redirect,
-            })
-            url = self._build_url('analysis', ['is_risky_analysis_artifact'])
+            params = purge_none(
+                {
+                    "artifact_uuid": f"{report_uuid}:{artifact_name}",
+                    "uuid": task_uuid,
+                    "allow_datacenter_redirect": allow_datacenter_redirect,
+                }
+            )
+            url = self._build_url("analysis", ["is_risky_analysis_artifact"])
             return self._api_request(url, params, raw=raw, verify=verify)
         raise InvalidArtifactError("The report uuid and artifact name must both be provided")
 
@@ -3279,12 +3281,12 @@ class AnalysisClient(AnalysisClientBase):
 
     DEFAULT_TIMEOUT = 60
 
-    _AUTH_METHOD__LICENSE = 'license'
-    _AUTH_METHOD__UNAUTHENTICATED = 'unauthenticated'
+    _AUTH_METHOD__LICENSE = "license"
+    _AUTH_METHOD__UNAUTHENTICATED = "unauthenticated"
     _AUTH_METHODS = (_AUTH_METHOD__LICENSE, _AUTH_METHOD__UNAUTHENTICATED)
 
     @classmethod
-    def from_config(cls, config, config_section='analysis', logger=None):
+    def from_config(cls, config, config_section="analysis", logger=None):
         """
         Factory method for instantiating an API client from config
 
@@ -3297,39 +3299,39 @@ class AnalysisClient(AnalysisClientBase):
         """
         auth_method = cls._AUTH_METHOD__LICENSE
         try:
-            auth_method = config.get(config_section, 'auth_method')
+            auth_method = config.get(config_section, "auth_method")
         except configparser.NoOptionError:
             pass  # keep default
         else:
             if auth_method not in cls._AUTH_METHODS:
-                raise ValueError("Unsupported auth_method '{}'".format(auth_method))
+                raise ValueError(f"Unsupported auth_method '{auth_method}'")
 
         try:
-            verify_ssl = config.getboolean(config_section, 'verify_ssl')
+            verify_ssl = config.getboolean(config_section, "verify_ssl")
         except configparser.NoOptionError:
             verify_ssl = True
 
         try:
-            timeout = config.getfloat(config_section, 'timeout')
+            timeout = config.getfloat(config_section, "timeout")
         except configparser.NoOptionError:
             timeout = AnalysisClient.DEFAULT_TIMEOUT
 
         key = None
         api_token = None
         if auth_method == cls._AUTH_METHOD__LICENSE:
-            key = config.get(config_section, 'key')
+            key = config.get(config_section, "key")
             try:
-                api_token = config.get(config_section, 'api_token')
+                api_token = config.get(config_section, "api_token")
             except configparser.NoOptionError:
                 pass  # for sensor-licenses, the API-token is optional
 
         try:
-            use_cdn = config.getboolean(config_section, 'use_cdn')
+            use_cdn = config.getboolean(config_section, "use_cdn")
         except configparser.NoOptionError:
             use_cdn = None
 
         return cls(
-            base_url=config.get(config_section, 'url'),
+            base_url=config.get(config_section, "url"),
             key=key,
             api_token=api_token,
             verify_ssl=verify_ssl,
@@ -3351,7 +3353,7 @@ class AnalysisClient(AnalysisClientBase):
         timeout=DEFAULT_TIMEOUT,
         use_cdn=None,
         proxies=None,
-        config=None
+        config=None,
     ):
         """
         :param str base_url: URL where the lastline analysis API is located. (required)
@@ -3415,10 +3417,10 @@ class AnalysisClient(AnalysisClientBase):
             return
 
         self.__session = requests.session()
-        url = self._build_url('authentication', ['login'])
-        params = {'key': self.__key}
+        url = self._build_url("authentication", ["login"])
+        params = {"key": self.__key}
         if self.__api_token:
-            params['api_token'] = self.__api_token
+            params["api_token"] = self.__api_token
         try:
             self._api_request(url=url, params=params, post=True, verify=self.__verify_ssl)
         except FailedRequestError as exc:
@@ -3477,27 +3479,19 @@ class AnalysisClient(AnalysisClientBase):
                 file_stream = file_object
             file_stream.seek(stream_position)
 
-    def _api_request(self,
-                     url,
-                     params=None,
-                     files=None,
-                     timeout=None,
-                     post=False,
-                     raw=False,
-                     requested_format="json",
-                     verify=True):
+    def _api_request(self, url, params=None, files=None, timeout=None, post=False, raw=False, requested_format="json", verify=True):
         # first, perform authentication, if we have no session
         if not self.__session:
             self._login()
 
         if self._logger():
-            self._logger().info("Requesting %s" % url)
+            self._logger().info(f"Requesting {url}")
         if not params:
             params = {}
 
         # we allow anyone setting this flag, but only admins will get any data back
         if self.REQUEST_PERFDATA:
-            params['perfdata'] = 1
+            params["perfdata"] = 1
 
         method = "GET"
         data = None
@@ -3520,11 +3514,15 @@ class AnalysisClient(AnalysisClientBase):
         while True:
             try:
                 response = self.__session.request(
-                    method, url,
-                    params=params, data=data, files=files,
+                    method,
+                    url,
+                    params=params,
+                    data=data,
+                    files=files,
                     timeout=timeout or self.__timeout,
                     verify=verify_ca_bundle,
-                    proxies=self.__proxies)
+                    proxies=self.__proxies,
+                )
                 # raise if anything went wrong
                 response.raise_for_status()
 
@@ -3560,15 +3558,12 @@ class AnalysisClient(AnalysisClientBase):
                 # no parameters are provided or the string is empty
                 disp_type, disp_params = cgi.parse_header(content_disposition)
                 if disp_type:
-                    disposition = {'type': disp_type.lower(),
-                                   'params': disp_params}
+                    disposition = {"type": disp_type.lower(), "params": disp_params}
 
             response_data = response.content
 
             try:
-                response_result = self._process_response_page(
-                    response_data, raw, requested_format, disposition
-                )
+                response_result = self._process_response_page(response_data, raw, requested_format, disposition)
             except AuthenticationError:
                 self._logout()
 
@@ -3580,12 +3575,10 @@ class AnalysisClient(AnalysisClientBase):
                 # don't try more than N times - we essentially need to only retry establishing a
                 # session, so N>2 doesn't make too much sense
                 if login_attempt >= self.MAX_LOGIN_ATTEMPTS:
-                    raise AuthenticationError(
-                        'login failed for {} times'.format(self.MAX_LOGIN_ATTEMPTS))
+                    raise AuthenticationError(f"login failed for {self.MAX_LOGIN_ATTEMPTS} times")
 
                 if self.__logger:
-                    self.__logger.warning('attempting to restore connection for %d time',
-                                          login_attempt)
+                    self.__logger.warning("attempting to restore connection for %d time", login_attempt)
                 self._login()
                 self._restore_stream_positions(stream_positions, files)
                 login_attempt += 1
@@ -3594,12 +3587,21 @@ class AnalysisClient(AnalysisClientBase):
                 return response_result
 
 
-class SubmittedTask(object):
+class SubmittedTask:
     """
     Representation of a task that was submitted
     """
-    def __init__(self, task_uuid, score=None, error=None, error_exception=None,
-                 submission_timestamp=None, insufficient_task_input_errors=None, expires=None):
+
+    def __init__(
+        self,
+        task_uuid,
+        score=None,
+        error=None,
+        error_exception=None,
+        submission_timestamp=None,
+        insufficient_task_input_errors=None,
+        expires=None,
+    ):
         """
         :param task_uuid: The returned task-UUID, if one was returned
         :type task_uuid: `str` | None
@@ -3687,15 +3689,15 @@ class SubmittedTask(object):
     def __str__(self):
         s = "AnalysisTask"
         if self.task_uuid:
-            s += " {}".format(self.task_uuid)
+            s += f" {self.task_uuid}"
         if self.submission_timestamp:
-            s += " {}".format(self.submission_timestamp)
+            s += f" {self.submission_timestamp}"
         if self.error_exception:
-            s += "(error: {})".format(self.error_exception)
+            s += f"(error: {self.error_exception})"
         elif self.error:
-            s += "(error: {})".format(self.error)
+            s += f"(error: {self.error})"
         elif self.__score is not None:
-            s += "(score: {})".format(self.__score)
+            s += f"(score: {self.__score})"
         return s
 
 
@@ -3703,10 +3705,21 @@ class SubmittedFileTask(SubmittedTask):
     """
     Representation of a file task that was submitted
     """
-    def __init__(self, file_md5, file_sha1, file_sha256, task_uuid,
-                 filename=None, score=None,
-                 error=None, error_exception=None, submission_timestamp=None,
-                 insufficient_task_input_errors=None, expires=None):
+
+    def __init__(
+        self,
+        file_md5,
+        file_sha1,
+        file_sha256,
+        task_uuid,
+        filename=None,
+        score=None,
+        error=None,
+        error_exception=None,
+        submission_timestamp=None,
+        insufficient_task_input_errors=None,
+        expires=None,
+    ):
         """
         :param file_md5: The MD5 of the submitted file
         :type file_md5: `str`
@@ -3770,15 +3783,11 @@ class SubmittedFileTask(SubmittedTask):
         return self.__filename
 
     def __str__(self):
-        s = "%s: MD5=%s, SHA1=%s" % (
-            SubmittedTask.__str__(self),
-            self.file_md5,
-            self.file_sha1,
-        )
+        s = f"{SubmittedTask.__str__(self)}: MD5={self.file_md5}, SHA1={self.file_sha1}"
         if self.file_sha256:
-            s += ", SHA256=%s" % self.file_sha256
+            s += f", SHA256={self.file_sha256}"
         if self.filename:
-            s += ", name=%s" % self.filename
+            s += f", name={self.filename}"
         return s
 
 
@@ -3786,8 +3795,8 @@ class SubmittedURLTask(SubmittedTask):
     """
     Representation of a URL task that was submitted
     """
-    def __init__(self, url, task_uuid, referer=None, score=None, error=None, error_exception=None,
-                 submission_timestamp=None, expires=None):
+
+    def __init__(self, url, task_uuid, referer=None, score=None, error=None, error_exception=None, submission_timestamp=None, expires=None):
         """
         :param url: The URL that was submitted
         :type url: `str`
@@ -3827,27 +3836,18 @@ class SubmittedURLTask(SubmittedTask):
         return self.__referer
 
     def __str__(self):
-        s = "%s: URL=%s" % (
-            SubmittedTask.__str__(self),
-            self.url,
-        )
+        s = f"{SubmittedTask.__str__(self)}: URL={self.url}"
         if self.referer:
-            s += ", refer(r)er=%s" % self.referer
+            s += f", refer(r)er={self.referer}"
         return s
 
 
-class ExportedReport(object):
+class ExportedReport:
     """
     Representation of a report that was exported
     """
 
-    def __init__(
-            self,
-            task_uuid,
-            report_uuid=None,
-            report_stream=None,
-            export_timestamp=None,
-            export_error=None):
+    def __init__(self, task_uuid, report_uuid=None, report_stream=None, export_timestamp=None, export_error=None):
         """
         :param str task_uuid: Unique identifier for the task that was exported
         :param str|None report_uuid: Unique identifier for the exported report
@@ -3882,16 +3882,19 @@ class ExportedReport(object):
         return self.__export_error
 
     def __eq__(self, other):
-        return (isinstance(other, ExportedReport)
-                and other.task_uuid == self.task_uuid
-                and other.report_uuid == self.report_uuid
-                and other.export_error == self.export_error)
+        return (
+            isinstance(other, ExportedReport)
+            and other.task_uuid == self.task_uuid
+            and other.report_uuid == self.report_uuid
+            and other.export_error == self.export_error
+        )
 
 
-class SubmissionHelper(object):
+class SubmissionHelper:
     """
     Helper class for handling submission and task retrieval
     """
+
     # The max number of task-uuids to print in logging when telling how many tasks
     # are still pending to be completed
     MAX_WAITING_TASK_UUIDS_NUM = 10
@@ -3909,7 +3912,7 @@ class SubmissionHelper(object):
         if logger:
             self.__logger = logger
         else:
-            self.__logger = logging.getLogger('lastline.analysis.api_client')
+            self.__logger = logging.getLogger("lastline.analysis.api_client")
             self.__logger.setLevel(logging.DEBUG)
             ch = logging.StreamHandler(sys.stdout)
             ch.setLevel(logging.DEBUG)
@@ -3962,31 +3965,31 @@ class SubmissionHelper(object):
         # this point after reading the file for computing hashes
         file_pos = file_stream.tell()
         try:
-            file_md5 = kwargs.pop('file_md5')
+            file_md5 = kwargs.pop("file_md5")
             if not file_md5:
                 raise KeyError()
         except KeyError:
-            file_md5 = hash_stream(file_stream, 'md5')
+            file_md5 = hash_stream(file_stream, "md5")
             file_stream.seek(file_pos)
         try:
-            file_sha1 = kwargs.pop('file_sha1')
+            file_sha1 = kwargs.pop("file_sha1")
             if not file_sha1:
                 raise KeyError()
         except KeyError:
-            file_sha1 = hash_stream(file_stream, 'sha1')
+            file_sha1 = hash_stream(file_stream, "sha1")
             file_stream.seek(file_pos)
         try:
-            file_sha256 = kwargs.pop('file_sha256')
+            file_sha256 = kwargs.pop("file_sha256")
             if not file_sha256:
                 raise KeyError()
         except KeyError:
-            file_sha256 = hash_stream(file_stream, 'sha256')
+            file_sha256 = hash_stream(file_stream, "sha256")
             file_stream.seek(file_pos)
 
         try:
-            filename = kwargs.pop('filename')
+            filename = kwargs.pop("filename")
         except KeyError:
-            if hasattr(file_stream, 'name'):
+            if hasattr(file_stream, "name"):
                 filename = os.path.basename(file_stream.name)
             else:
                 # auto-select in the API
@@ -3994,17 +3997,15 @@ class SubmissionHelper(object):
 
         # submit_file_hash does not take the "delete_after_analysis" parameter
         try:
-            delete_after_analysis = kwargs.pop('delete_after_analysis')
+            delete_after_analysis = kwargs.pop("delete_after_analysis")
         except KeyError:
             delete_after_analysis = False
         # same for "mime_type" (only for submit_file_hash)
         try:
-            mime_type = kwargs.pop('mime_type')
+            mime_type = kwargs.pop("mime_type")
         except KeyError:
             mime_type = None
-        self.__logger.info("Submitting file %s (md5=%s, sha1=%s, sha256=%s)",
-                           filename or '<unnamed>', file_md5, file_sha1,
-                           file_sha256)
+        self.__logger.info("Submitting file %s (md5=%s, sha1=%s, sha256=%s)", filename or "<unnamed>", file_md5, file_sha1, file_sha256)
         result_data = None
         task_uuid = None
         submission_timestamp = None
@@ -4015,15 +4016,17 @@ class SubmissionHelper(object):
         insufficient_task_input_errors = None
         expires = None
         # Only submit file hash if bypass_cache is not enabled
-        if not kwargs.get('bypass_cache'):
+        if not kwargs.get("bypass_cache"):
             try:
                 result_data = self.__analysis_client.submit_file_hash(
-                    md5=file_md5, sha1=file_sha1, sha256=file_sha256,
+                    md5=file_md5,
+                    sha1=file_sha1,
+                    sha256=file_sha256,
                     filename=filename,
                     full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
                     mime_type=mime_type,
-                    **kwargs
-                )['data']
+                    **kwargs,
+                )["data"]
             except AnalysisAPIError as err:
                 # NOTE: In theory we should only submit again if the file is not
                 # known, but submitting again either way does not hurt
@@ -4039,30 +4042,30 @@ class SubmissionHelper(object):
                     filename=filename,
                     full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
                     delete_after_analysis=delete_after_analysis,
-                    **kwargs
-                )['data']
+                    **kwargs,
+                )["data"]
             except AnalysisAPIError as err2:
                 # we are handling this error, and it's not a bug in the code, so
                 # logged just as warning
                 self.__logger.warning(
-                    "Submitting file %s (md5=%s, sha1=%s, sha256=%s) failed: %s",
-                    filename or '<unnamed>', file_md5, file_sha1, file_sha256, err2)
+                    "Submitting file %s (md5=%s, sha1=%s, sha256=%s) failed: %s", filename or "<unnamed>", file_md5, file_sha1, file_sha256, err2
+                )
 
                 error = str(err2)
                 error_exception = err2
 
         if result_data is not None:
             try:
-                task_uuid = result_data['task_uuid']
+                task_uuid = result_data["task_uuid"]
             except KeyError:
                 # this path is not possible according to the API documentation,
                 # but just to be on the save side...
                 error = "no task returned"
-            submission_timestamp = result_data.get('submission_timestamp')
-            score = result_data.get('score')
-            insufficient_task_input_errors = result_data.get('insufficient_task_input_errors')
+            submission_timestamp = result_data.get("submission_timestamp")
+            score = result_data.get("score")
+            insufficient_task_input_errors = result_data.get("insufficient_task_input_errors")
             try:
-                expires = parse_datetime(result_data['expires'])
+                expires = parse_datetime(result_data["expires"])
             except KeyError:
                 expires = None
 
@@ -4108,7 +4111,7 @@ class SubmissionHelper(object):
         # NOTE: We release this file to customers who may run this code on Windows. Make
         # sure to open the file in binary-mode. Python will otherwise truncate the file
         # at the location where it detects non-text, and does so without any warning
-        with open(filename, 'rb') as file_stream:
+        with open(filename, "rb") as file_stream:
             return self.submit_file_stream(file_stream, **kwargs)
 
     def submit_url(self, url, **kwargs):
@@ -4143,11 +4146,7 @@ class SubmissionHelper(object):
         error_exception = None
         expires = None
         try:
-            result_data = self.__analysis_client.submit_url(
-                url=url,
-                full_report_score=ANALYSIS_API_NO_REPORT_DETAILS,
-                **kwargs
-            )['data']
+            result_data = self.__analysis_client.submit_url(url=url, full_report_score=ANALYSIS_API_NO_REPORT_DETAILS, **kwargs)["data"]
         except AnalysisAPIError as err:
             # we are handling this error, and it's not a bug in the code, so
             # logged just as warning
@@ -4157,16 +4156,16 @@ class SubmissionHelper(object):
 
         if result_data is not None:
             try:
-                task_uuid = result_data['task_uuid']
+                task_uuid = result_data["task_uuid"]
             except KeyError:
                 # this path is not possible according to the API documentation,
                 # but just to be on the save side...
                 error = "no task returned"
             else:
-                submission_timestamp = result_data.get('submission_timestamp')
-            score = result_data.get('score')
+                submission_timestamp = result_data.get("submission_timestamp")
+            score = result_data.get("score")
             try:
-                expires = parse_datetime(result_data['expires'])
+                expires = parse_datetime(result_data["expires"])
             except KeyError:
                 expires = None
 
@@ -4174,7 +4173,7 @@ class SubmissionHelper(object):
         # caller can skip waiting for completion if possible
         return SubmittedURLTask(
             url=url,
-            referer=kwargs.get('referer'),
+            referer=kwargs.get("referer"),
             task_uuid=task_uuid,
             submission_timestamp=submission_timestamp,
             score=score,
@@ -4184,10 +4183,8 @@ class SubmissionHelper(object):
         )
 
     def submit_file_streams_and_wait_for_completion(
-            self, file_streams,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            **kwargs):
+        self, file_streams, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, **kwargs
+    ):
         """
         Submit a list of files and wait for completion: For each file, submit
         the file for analysis, wait for completion, and retrieve results.
@@ -4217,9 +4214,7 @@ class SubmissionHelper(object):
         for file_stream in file_streams:
             # the caller may want to submit all files using the same
             # filename, so we really forward *all* arguments
-            results[file_stream] = self.submit_file_stream(
-                file_stream=file_stream, **kwargs
-            )
+            results[file_stream] = self.submit_file_stream(file_stream=file_stream, **kwargs)
 
         try:
             self.wait_for_completion(
@@ -4227,18 +4222,15 @@ class SubmissionHelper(object):
                 start_timestamp=start_ts,
                 wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
-                verify=kwargs.get('verify', True)
+                verify=kwargs.get("verify", True),
             )
         except WaitResultTimeout as err:
-            self.__logger.warning("Waiting for file submissions completion "
-                                  "failed: %s", err)
+            self.__logger.warning("Waiting for file submissions completion failed: %s", err)
         return results
 
     def submit_filenames_and_wait_for_completion(
-            self, filenames,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            **kwargs):
+        self, filenames, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, **kwargs
+    ):
         """
         Submit a list of files and wait for completion: For each file, submit
         the file for analysis, wait for completion, and retrieve results.
@@ -4269,13 +4261,13 @@ class SubmissionHelper(object):
                 # NOTE: We release this file to customers who may run this code on Windows. Make
                 # sure to open the file in binary-mode. Python will otherwise truncate the file
                 # at the location where it detects non-text, and does so without any warning
-                file_streams[open(filename, 'rb')] = filename
+                file_streams[open(filename, "rb")] = filename
 
             results_streams = self.submit_file_streams_and_wait_for_completion(
                 file_streams=list(file_streams.keys()),
                 wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
-                **kwargs
+                **kwargs,
             )
             # map by-stream results into by-name results
             results = {}
@@ -4287,11 +4279,7 @@ class SubmissionHelper(object):
             for file_stream in file_streams:
                 file_stream.close()
 
-    def submit_urls_and_wait_for_completion(
-            self, urls,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            **kwargs):
+    def submit_urls_and_wait_for_completion(self, urls, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, **kwargs):
         """
         Submit a list of URLs and wait for completion: For each URL, submit
         the URL for analysis, wait for completion, and retrieve results.
@@ -4324,18 +4312,15 @@ class SubmissionHelper(object):
                 start_timestamp=start_ts,
                 wait_completion_interval_seconds=wait_completion_interval_seconds,
                 wait_completion_max_seconds=wait_completion_max_seconds,
-                verify=kwargs.get('verify', True)
+                verify=kwargs.get("verify", True),
             )
         except WaitResultTimeout as err:
-            self.__logger.warning("Waiting for URL submissions completion "
-                                  "failed: %s", err)
+            self.__logger.warning("Waiting for URL submissions completion failed: %s", err)
         return results
 
     def wait_for_completion_of_submission(
-            self, submission, start_timestamp,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            verify=True):
+        self, submission, start_timestamp, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, verify=True
+    ):
         """
         Wait for completion of a given tasks.
 
@@ -4367,10 +4352,8 @@ class SubmissionHelper(object):
         )
 
     def wait_for_completion(
-            self, submissions, start_timestamp,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            verify=True):
+        self, submissions, start_timestamp, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, verify=True
+    ):
         """
         Wait for completion of a given dictionary of tasks.
 
@@ -4397,10 +4380,12 @@ class SubmissionHelper(object):
         :raises CommunicationError: Error contacting Lastline Analyst API.
         """
         g = self.yield_completed_tasks(
-                submissions, start_timestamp,
-                wait_completion_interval_seconds=wait_completion_interval_seconds,
-                wait_completion_max_seconds=wait_completion_max_seconds,
-                verify=verify)
+            submissions,
+            start_timestamp,
+            wait_completion_interval_seconds=wait_completion_interval_seconds,
+            wait_completion_max_seconds=wait_completion_max_seconds,
+            verify=verify,
+        )
         # wait for completion all the tasks by invoking generator
         for _ in g:
             pass
@@ -4416,24 +4401,18 @@ class SubmissionHelper(object):
         :raises CommunicationError: If num retries expired.
         """
         if num_retries is None:
-            self.__logger.warning(
-                "Communication Error - retry sending request. UNLIMITED times left."
-            )
+            self.__logger.warning("Communication Error - retry sending request. UNLIMITED times left.")
         elif num_retries > 0:
             num_retries -= 1
-            self.__logger.warning(
-                "Communication Error - retry sending request. %d times left.", num_retries
-            )
+            self.__logger.warning("Communication Error - retry sending request. %d times left.", num_retries)
         else:
             self.__logger.warning("Communication error: %s", e)
             raise e
         return num_retries
 
     def yield_completed_tasks(
-            self, submissions, start_timestamp,
-            wait_completion_interval_seconds=15,
-            wait_completion_max_seconds=None,
-            verify=True):
+        self, submissions, start_timestamp, wait_completion_interval_seconds=15, wait_completion_max_seconds=None, verify=True
+    ):
         """
         Returns a generator, which gives completed tasks as soon as they are
         ready.
@@ -4474,8 +4453,7 @@ class SubmissionHelper(object):
             if result.task_uuid is not None and not result.is_complete()
         }
         if not missing_results:
-            self.__logger.info("No need to wait for completion for any of %d "
-                               "submissions", len(submissions))
+            self.__logger.info("No need to wait for completion for any of %d submissions", len(submissions))
             return
         self.__logger.info(
             "Waiting for completion of %d/%d submissions",
@@ -4484,31 +4462,18 @@ class SubmissionHelper(object):
         )
 
         start_completion_time = time.time()
-        end_completion_time = (
-            start_completion_time + wait_completion_max_seconds
-            if wait_completion_max_seconds is not None else None
-        )
+        end_completion_time = start_completion_time + wait_completion_max_seconds if wait_completion_max_seconds is not None else None
         # Number of times to re-sending request
         num_retries = self.__num_retries
         while missing_results:
-            waiting_task_uuids = list(missing_results.keys())[
-                :SubmissionHelper.MAX_WAITING_TASK_UUIDS_NUM
-            ]
+            waiting_task_uuids = list(missing_results.keys())[: SubmissionHelper.MAX_WAITING_TASK_UUIDS_NUM]
             if len(missing_results) > SubmissionHelper.MAX_WAITING_TASK_UUIDS_NUM:
-                waiting_tasks = '{},...'.format(','.join(waiting_task_uuids))
+                waiting_tasks = "{},...".format(",".join(waiting_task_uuids))
             else:
-                waiting_tasks = ','.join(waiting_task_uuids)
-            self.__logger.debug(
-                "Waiting for completion of %d submissions: %s",
-                len(missing_results),
-                waiting_tasks
-            )
+                waiting_tasks = ",".join(waiting_task_uuids)
+            self.__logger.debug("Waiting for completion of %d submissions: %s", len(missing_results), waiting_tasks)
             try:
-                completed_data = self.__analysis_client.get_completed(
-                    after=start_timestamp,
-                    verify=verify,
-                    include_score=True
-                )['data']
+                completed_data = self.__analysis_client.get_completed(after=start_timestamp, verify=verify, include_score=True)["data"]
             # only ignore the communication error and resending the request
             except CommunicationError as e:
                 num_retries = self.__handle_communication_error(e, num_retries)
@@ -4517,9 +4482,9 @@ class SubmissionHelper(object):
                 if self.__num_retries is not None:
                     num_retries = self.__num_retries
                 # resume from here next iteration:
-                start_timestamp = completed_data['resume']
-                if completed_data['tasks']:
-                    for task_uuid, score in completed_data['tasks'].items():
+                start_timestamp = completed_data["resume"]
+                if completed_data["tasks"]:
+                    for task_uuid, score in completed_data["tasks"].items():
                         try:
                             submission_id = missing_results[task_uuid]
                         except KeyError:
@@ -4536,12 +4501,11 @@ class SubmissionHelper(object):
                         result = submissions[submission_id]
                         result.set_score(score)  # result.is_complete() becomes True
                         del missing_results[task_uuid]
-                        self.__logger.debug("Got result for task %s: %s",
-                                            task_uuid, result)
+                        self.__logger.debug("Got result for task %s: %s", task_uuid, result)
                         yield result
                 if not missing_results:
                     break
-                if completed_data['more_results_available']:
+                if completed_data["more_results_available"]:
                     # If we have more results available to be fetched, don't need to sleep
                     continue
 
@@ -4549,9 +4513,7 @@ class SubmissionHelper(object):
             if end_completion_time is not None:
                 now = time.time()
                 if now >= end_completion_time:
-                    self.__logger.warning("Waiting for completion of %d "
-                                          "submissions timed out",
-                                          len(missing_results))
+                    self.__logger.warning("Waiting for completion of %d submissions timed out", len(missing_results))
                     raise WaitResultTimeout()
                 # make sure we only sleep as long as we have time left before
                 # the timeout
@@ -4559,8 +4521,7 @@ class SubmissionHelper(object):
                     sleep_timeout = end_completion_time - now
             time.sleep(sleep_timeout)
 
-        self.__logger.info("Done waiting for completion of %d submissions",
-                           len(submissions))
+        self.__logger.info("Done waiting for completion of %d submissions", len(submissions))
 
     def export_and_yield_reports(self, task_uuids, sleep_interval_seconds=15, **kwargs):
         """
@@ -4585,10 +4546,7 @@ class SubmissionHelper(object):
             error = None
             exported_report_uuid = None
             try:
-                result_data = self.__analysis_client.export_report(
-                    uuid=task_uuid,
-                    **kwargs
-                )['data']
+                result_data = self.__analysis_client.export_report(uuid=task_uuid, **kwargs)["data"]
             except AnalysisAPIError as err:
                 # we are handling this error, and it's not a bug in the code, so
                 # logged just as warning
@@ -4596,14 +4554,14 @@ class SubmissionHelper(object):
                 error = str(err)
             else:
                 try:
-                    exported_report_uuid = result_data['exported_report_uuid']
+                    exported_report_uuid = result_data["exported_report_uuid"]
                 except KeyError:
                     # this path is not possible according to the API documentation,
                     # but just to be on the safe side...
                     error = "no report identifier returned"
                 else:
                     if not resume_after_report_uuid_initialized:
-                        resume_after_report_uuid = result_data.get('resume_after_report_uuid')
+                        resume_after_report_uuid = result_data.get("resume_after_report_uuid")
                         resume_after_report_uuid_initialized = True
 
             if exported_report_uuid:
@@ -4613,19 +4571,9 @@ class SubmissionHelper(object):
                 yield ExportedReport(task_uuid, export_error=error)
 
         # Now that the exports are initiated, yield them as they complete
-        for exported_report in self.yield_exported_reports(
-            report_uuids,
-            resume_after_report_uuid,
-            sleep_interval_seconds=sleep_interval_seconds
-        ):
-            yield exported_report
+        yield from self.yield_exported_reports(report_uuids, resume_after_report_uuid, sleep_interval_seconds=sleep_interval_seconds)
 
-    def yield_exported_reports(
-        self,
-        submitted_report_uuids,
-        resume_after_report_uuid,
-        sleep_interval_seconds=15
-    ):
+    def yield_exported_reports(self, submitted_report_uuids, resume_after_report_uuid, sleep_interval_seconds=15):
         """
         Yield exported reports as they become available for download.
 
@@ -4639,33 +4587,29 @@ class SubmissionHelper(object):
         :rtype: Iterator(ExportedReport)
         """
         if not submitted_report_uuids:
-            self.__logger.debug('no need to wait for completion, no reports requested')
+            self.__logger.debug("no need to wait for completion, no reports requested")
             return
         num_retries = self.__num_retries
         self.__logger.info(
-            "Waiting for completion of %d exported reports", len(submitted_report_uuids),
+            "Waiting for completion of %d exported reports",
+            len(submitted_report_uuids),
         )
         while submitted_report_uuids:
             try:
-                reports = self.__analysis_client.get_completed_exported_reports(
-                    resume_after_report_uuid
-                )['data']['available_reports']
+                reports = self.__analysis_client.get_completed_exported_reports(resume_after_report_uuid)["data"]["available_reports"]
             except CommunicationError as e:
                 num_retries = self.__handle_communication_error(e, num_retries)
             else:
                 for report in reports:
-                    report_uuid = report['exported_report_uuid']
+                    report_uuid = report["exported_report_uuid"]
                     if report_uuid in submitted_report_uuids:
                         exported_report = None
-                        task_uuid = report['task_uuid']
-                        export_timestamp = parse_datetime(report['export_timestamp'])
-                        export_error = report.get('export_error')
+                        task_uuid = report["task_uuid"]
+                        export_timestamp = parse_datetime(report["export_timestamp"])
+                        export_error = report.get("export_error")
                         if export_error is not None:
                             # The report could not be exported, so don't even try to fetch it
-                            self.__logger.debug(
-                                'report %s not available, export failed: %s', report_uuid,
-                                export_error
-                            )
+                            self.__logger.debug("report %s not available, export failed: %s", report_uuid, export_error)
                             exported_report = ExportedReport(
                                 task_uuid,
                                 report_uuid=report_uuid,
@@ -4678,7 +4622,7 @@ class SubmissionHelper(object):
                             except CommunicationError as e:
                                 num_retries = self.__handle_communication_error(e, num_retries)
                             else:
-                                self.__logger.debug('got report %s.', report_uuid)
+                                self.__logger.debug("got report %s.", report_uuid)
                                 exported_report = ExportedReport(
                                     task_uuid,
                                     report_uuid=report_uuid,
@@ -4691,21 +4635,22 @@ class SubmissionHelper(object):
                             num_retries = self.__num_retries
                             resume_after_report_uuid = report_uuid
                     else:
-                        self.__logger.debug(
-                            'not yielding report %s, not in submission list', report_uuid
-                        )
+                        self.__logger.debug("not yielding report %s, not in submission list", report_uuid)
             if submitted_report_uuids:
                 self.__logger.info(
                     "Sleeping %ds for completion of %d exported reports (%s ...)",
-                    sleep_interval_seconds, len(submitted_report_uuids), submitted_report_uuids[0]
+                    sleep_interval_seconds,
+                    len(submitted_report_uuids),
+                    submitted_report_uuids[0],
                 )
                 time.sleep(sleep_interval_seconds)
 
 
-class QueryHelper(object):
+class QueryHelper:
     """
     Helper class for handling queries
     """
+
     def __init__(self, analysis_client, logger=None):
         """
         :param analysis_client: The client to use
@@ -4718,7 +4663,7 @@ class QueryHelper(object):
         if logger:
             self.__logger = logger
         else:
-            self.__logger = logging.getLogger('lastline.analysis.api_client')
+            self.__logger = logging.getLogger("lastline.analysis.api_client")
             self.__logger.setLevel(logging.DEBUG)
             ch = logging.StreamHandler(sys.stdout)
             ch.setLevel(logging.DEBUG)
@@ -4736,24 +4681,22 @@ class QueryHelper(object):
         :returns: A file-stream if the file is available, otherwise None
         :rtype: NamedStringIO
         """
-        results = self.__analysis_client.get_result(
-            uuid=task_uuid,
-            full_report_score=ANALYSIS_API_NO_REPORT_DETAILS)
+        results = self.__analysis_client.get_result(uuid=task_uuid, full_report_score=ANALYSIS_API_NO_REPORT_DETAILS)
         try:
-            reports = results['data']['reports']
+            reports = results["data"]["reports"]
         except KeyError:
             reports = None
         if not reports:
             return None
 
         for report in reports:
-            report_uuid = report.get('report_uuid')
+            report_uuid = report.get("report_uuid")
             if report_uuid:
                 try:
                     stream = self.__analysis_client.get_result_artifact(
                         uuid=task_uuid,
                         report_uuid=report_uuid,
-                        artifact_name='analysis_subject',
+                        artifact_name="analysis_subject",
                         password_protected=password_protected,
                     )
                 except Error:
@@ -4762,9 +4705,7 @@ class QueryHelper(object):
                     return stream
         return None
 
-    def download_analysis_subject_by_file_hash(
-        self, md5=None, sha1=None, sha256=None, password_protected=None
-    ):
+    def download_analysis_subject_by_file_hash(self, md5=None, sha1=None, sha256=None, password_protected=None):
         """
         Helper method for checking if a file is available for download
 
@@ -4780,25 +4721,22 @@ class QueryHelper(object):
         :returns: A file-stream if the file is available, otherwise None
         :rtype: NamedStringIO
         """
-        result = self.__analysis_client.query_file_hash(
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256)
-        if not result['data']['files_found']:
+        result = self.__analysis_client.query_file_hash(md5=md5, sha1=sha1, sha256=sha256)
+        if not result["data"]["files_found"]:
             return None
         return self.download_analysis_subject_file(
-            task_uuid=result['data']['tasks'][0]['task_uuid'],
+            task_uuid=result["data"]["tasks"][0]["task_uuid"],
             password_protected=password_protected,
         )
 
 
-class AnalyzeHelper(object):
+class AnalyzeHelper:
     """
     This class provides helper functions used for submitting files and urls to the
     Lastline Analyst API.
     """
 
-    DEFAULT_ANALYST_API_URL = 'https://analysis.lastline.com/analysis'
+    DEFAULT_ANALYST_API_URL = "https://analysis.lastline.com/analysis"
 
     @classmethod
     def factory(cls, url, token, key, logger, secure=False):
@@ -4812,16 +4750,10 @@ class AnalyzeHelper(object):
             api_token=token,
             # the API client is very verbose (in INFO mode) by default
             logger=logger,
-            verify_ssl=secure
+            verify_ssl=secure,
         )
 
-        return AnalyzeHelper(
-            url=url,
-            token=token,
-            key=key,
-            client=client,
-            logger=logger
-        )
+        return AnalyzeHelper(url=url, token=token, key=key, client=client, logger=logger)
 
     @staticmethod
     def from_config(conf_file, conf_section, logger, secure):
@@ -4852,13 +4784,7 @@ class AnalyzeHelper(object):
         except configparser.Error:
             raise configparser.Error("Missing credentials in configuration")
 
-        return AnalyzeHelper.factory(
-            url=url,
-            token=token,
-            key=key,
-            logger=logger,
-            secure=secure
-        )
+        return AnalyzeHelper.factory(url=url, token=token, key=key, logger=logger, secure=secure)
 
     def __init__(self, url, token, key, client, logger):
         """
@@ -4908,28 +4834,18 @@ class AnalyzeHelper(object):
             ping_successful = True
             self._client.completed(after=datetime.datetime.now())
         except requests.ConnectionError as err:
-            self._logger.error(
-                "Failed to connect to API server at %s, please make sure the API server is "
-                "reachable: %s", self._url, err
-            )
+            self._logger.error("Failed to connect to API server at %s, please make sure the API server is reachable: %s", self._url, err)
             return False
         except ssl.SSLError as err:
-            self._logger.error(
-                "Failed to verify SSL certificate for API at %s: %s",
-                self._url, err)
+            self._logger.error("Failed to verify SSL certificate for API at %s: %s", self._url, err)
             return False
         except AnalysisAPIError as err:
             if err.error_code == ANALYSIS_API_INVALID_CREDENTIALS:
-                self._logger.error(
-                    "Invalid credentials for %s: failed to authenticate to API server", self._url
-                )
+                self._logger.error("Invalid credentials for %s: failed to authenticate to API server", self._url)
             elif ping_successful:
                 # if we're partly successful, give the user a bit more information what could be the
                 # problem
-                self._logger.error(
-                    "API Credentials used for %s don't allow required functionality:"
-                    "%s", self._url, err
-                )
+                self._logger.error("API Credentials used for %s don't allow required functionality:%s", self._url, err)
             else:
                 self._logger.error("Failed to communicate with API at %s: %s", self._url, err)
             return False
@@ -4951,9 +4867,9 @@ class AnalyzeHelper(object):
         """
 
         try:
-            with open(result_filename, "wt") as f:
+            with open(result_filename, "w") as f:
                 f.write(result)
-        except IOError as err:
+        except OSError as err:
             self._logger.error("Failed to write result to file %s: %s", result_filename, err)
             return False
         return True
@@ -4969,7 +4885,7 @@ class AnalyzeHelper(object):
         :rtype: bool
         """
 
-        report_url = os.path.join(self._url, 'portal#/analyst/task', task_uuid)
+        report_url = os.path.join(self._url, "portal#/analyst/task", task_uuid)
         try:
             json_result = self._client.get_result(task_uuid, raw=True)
             json_analysis_tags = self._client.get_analysis_tags(task_uuid, raw=True)
@@ -4983,17 +4899,17 @@ class AnalyzeHelper(object):
         try:
             result = simplejson.loads(json_result)
             analysis_tags = simplejson.loads(json_analysis_tags)
-            json_report_url = simplejson.dumps({'report_url': report_url})
+            json_report_url = simplejson.dumps({"report_url": report_url})
         except Exception as err:
             logging.error("Unexpected response format for UUID %s: %s", task_uuid, err)
             return False
 
-        if not result['success'] or not analysis_tags['success']:
+        if not result["success"] or not analysis_tags["success"]:
             self._logger.error("Error fetching results for UUID %s: %s", task_uuid, result)
             return False
-        json_result_filename = base_result_filename + '_result.json'
-        json_report_result_filename = base_result_filename + '_report_url.json'
-        json_analysis_tags_filename = base_result_filename + '_analysis_tags.json'
+        json_result_filename = base_result_filename + "_result.json"
+        json_report_result_filename = base_result_filename + "_report_url.json"
+        json_analysis_tags_filename = base_result_filename + "_analysis_tags.json"
         self._write_result(json_result, json_result_filename)
         self._write_result(json_analysis_tags, json_analysis_tags_filename)
         self._write_result(json_report_url, json_report_result_filename)
@@ -5010,12 +4926,13 @@ class AnalyzeHelper(object):
             self._logger.error("Error in HTTP request to API: %s", err)
             return False
 
-        xml_result_filename = base_result_filename + '_result.xml'
-        xml_analysis_tags_filename = base_result_filename + '_analysis_tags.xml'
+        xml_result_filename = base_result_filename + "_result.xml"
+        xml_analysis_tags_filename = base_result_filename + "_analysis_tags.xml"
         self._write_result(xml_result, xml_result_filename)
         self._write_result(analysis_tags_xml, xml_analysis_tags_filename)
 
         return True
+
 
 #############################################################################
 #
@@ -5033,6 +4950,7 @@ def init_shell(banner):
     try:
         # pylint: disable=E0611,F0401
         from IPython.frontend.terminal import embed
+
         shell = embed.InteractiveShellEmbed(banner1=banner)
     except ImportError:  # iPython < 0.11
         import IPython
@@ -5046,7 +4964,8 @@ def init_shell(banner):
 
 def main(argv):
     deprecation_notice = "** DEPRECATION NOTICE: USE analysis_apiclient_shell.py INSTEAD **"
-    parser = optparse.OptionParser(usage="""
+    parser = optparse.OptionParser(
+        usage=f"""
 {deprecation_notice}
 
 Run client for analysis api with the provided credentials
@@ -5054,10 +4973,16 @@ Run client for analysis api with the provided credentials
     %prog access_key api_token
 
 {deprecation_notice}
-""".format(deprecation_notice=deprecation_notice))
-    parser.add_option("-u", "--api-url", dest="api_url",
-        type="string", default="https://analysis.lastline.com",
-        help="send API requests to this URL (debugging purposes)")
+"""
+    )
+    parser.add_option(
+        "-u",
+        "--api-url",
+        dest="api_url",
+        type="string",
+        default="https://analysis.lastline.com",
+        help="send API requests to this URL (debugging purposes)",
+    )
 
     (cmdline_options, args) = parser.parse_args(argv[1:])
     if len(args) != 2:
@@ -5065,9 +4990,7 @@ Run client for analysis api with the provided credentials
         return 1
 
     namespace = {}
-    namespace["analysis"] = AnalysisClient(cmdline_options.api_url,
-                                           key=args[0],
-                                           api_token=args[1])
+    namespace["analysis"] = AnalysisClient(cmdline_options.api_url, key=args[0], api_token=args[1])
 
     shell = init_shell(banner=deprecation_notice)
     shell(local_ns=namespace, global_ns=namespace)

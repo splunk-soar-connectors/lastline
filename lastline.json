@@ -16,7 +16,7 @@
     "consolidate_widgets": true,
     "logo": "logo_lastline.svg",
     "logo_dark": "logo_lastline_dark.svg",
-    "license": "Copyright (c) 2015-2023 Splunk Inc.",
+    "license": "Copyright (c) 2015-2025 Splunk Inc.",
     "python_version": "3",
     "configuration": {
         "base_url": {
