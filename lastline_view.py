@@ -1,6 +1,6 @@
 # File: lastline_view.py
 #
-# Copyright (c) 2015-2023 Splunk Inc.
+# Copyright (c) 2015-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,20 +13,22 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 def mask_string(url):
-    return url.lower() \
-           .replace('http', 'hXXp') \
-           .replace('/', '[/]') \
-           .replace(':[/][/]', '[://]') \
-           .replace('.', '[.]') \
-           .replace('?', '[?]') \
-           .replace('=', '[=]') \
-           .replace('&', '[&]')
+    return (
+        url.lower()
+        .replace("http", "hXXp")
+        .replace("/", "[/]")
+        .replace(":[/][/]", "[://]")
+        .replace(".", "[.]")
+        .replace("?", "[?]")
+        .replace("=", "[=]")
+        .replace("&", "[&]")
+    )
 
 
 def parse_report(report):
     # pre-process the report here if required
 
-    ana_subjects = report.get('analysis_subjects')
+    ana_subjects = report.get("analysis_subjects")
 
     if not ana_subjects:
         return
@@ -34,21 +36,21 @@ def parse_report(report):
     for subject in ana_subjects:
         file_name = None
         try:
-            file_name = subject['overview']['process']['executable']['static_pe_information']['original_filename']
+            file_name = subject["overview"]["process"]["executable"]["static_pe_information"]["original_filename"]
         except:
             pass
 
         if not file_name:
             try:
-                file_name = subject['overview']['process']['executable']['abs_path']
-                file_name = file_name.split('\\')[-1]
+                file_name = subject["overview"]["process"]["executable"]["abs_path"]
+                file_name = file_name.split("\\")[-1]
             except:
                 pass
 
         if not file_name:
             try:
-                file_name = subject['overview']['process']['executable']['filename']
-                file_name = file_name.split('\\')[-1]
+                file_name = subject["overview"]["process"]["executable"]["filename"]
+                file_name = file_name.split("\\")[-1]
             except:
                 pass
 
@@ -58,22 +60,21 @@ def parse_report(report):
         pid = None
 
         try:
-            pid = subject['overview']['process']['process_id']
+            pid = subject["overview"]["process"]["process_id"]
         except:
             pid = "Unknown"
             pass
 
-        subject['process_display'] = "{0} (PID: {1})".format(file_name, pid)
+        subject["process_display"] = f"{file_name} (PID: {pid})"
 
     return report
 
 
 def get_ctx_result(result):
+    ctx_result = {"summary": result.get_summary(), "param": result.get_param(), "status": result.get_status()}
 
-    ctx_result = {'summary': result.get_summary(), 'param': result.get_param(), 'status': result.get_status()}
-
-    if not ctx_result['status']:
-        ctx_result['message'] = result.get_message()
+    if not ctx_result["status"]:
+        ctx_result["message"] = result.get_message()
 
     data = result.get_data()
 
@@ -82,44 +83,38 @@ def get_ctx_result(result):
 
     data = data[0]
 
-    report = data.get('report')
+    report = data.get("report")
 
     if not report:
         return ctx_result
 
-    ctx_result['report'] = report
+    ctx_result["report"] = report
     parse_report(report)
 
     return ctx_result
 
 
 def display_report(provides, all_app_runs, context):
-
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
-
             ctx_result = get_ctx_result(result)
             if not ctx_result:
                 continue
             results.append(ctx_result)
     # print context
-    return 'lastline_display_report.html'
+    return "lastline_display_report.html"
 
 
 def display_artifacts(provides, all_app_runs, context):
-    context['results'] = results = []
+    context["results"] = results = []
     for summary, action_results in all_app_runs:
         for result in action_results:
             for data in result.get_data():
-                if 'url' in data:
-                    data['masked_url'] = mask_string(data['url'])
-                if 'file' in data:
-                    data['masked_file'] = mask_string(data['source_file'])
-                results.append({
-                    'param': result.get_param(),
-                    'data': data,
-                    'summary': result.get_summary()
-                })
+                if "url" in data:
+                    data["masked_url"] = mask_string(data["url"])
+                if "file" in data:
+                    data["masked_file"] = mask_string(data["source_file"])
+                results.append({"param": result.get_param(), "data": data, "summary": result.get_summary()})
 
-    return 'lastline_display_artifacts.html'
+    return "lastline_display_artifacts.html"
