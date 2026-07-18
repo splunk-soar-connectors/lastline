@@ -22,6 +22,7 @@ import time
 
 # Other imports used by this connector
 from datetime import datetime
+from urllib.parse import urlparse
 
 import phantom.app as phantom
 import phantom.rules as phrules
@@ -57,6 +58,9 @@ class LastlineConnector(BaseConnector):
         )
         self._account_name = config.get("account_username")
         self._report_url = config.get("report_url", "https://user.lastline.com").rstrip("/")
+        parsed_report_url = urlparse(self._report_url)
+        if parsed_report_url.scheme.lower() not in {"http", "https"} or not parsed_report_url.netloc:
+            return self.set_status(phantom.APP_ERROR, "Report URL must be an absolute HTTP or HTTPS URL")
         self._results_url_template = "{}{}".format(self._report_url, "/portal#/analyst/task/{}")
 
         return phantom.APP_SUCCESS
