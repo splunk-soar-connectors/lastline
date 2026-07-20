@@ -1,7 +1,7 @@
 # Lastline
 
 Publisher: Splunk Community <br>
-Connector Version: 3.1.0 <br>
+Connector Version: 3.1.1 <br>
 Product Vendor: Lastline <br>
 Product Name: Lastline <br>
 Minimum Product Version: 6.1.0
