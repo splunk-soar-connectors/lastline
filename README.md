@@ -1,9 +1,9 @@
 # Lastline
 
-Publisher: Splunk Community \
-Connector Version: 3.1.0 \
-Product Vendor: Lastline \
-Product Name: Lastline \
+Publisher: Splunk Community <br>
+Connector Version: 3.1.0 <br>
+Product Vendor: Lastline <br>
+Product Name: Lastline <br>
 Minimum Product Version: 6.1.0
 
 This app supports executing investigative actions to analyze executables and URLs on the online Lastline sandbox
@@ -24,17 +24,17 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[detonate file](#action-detonate-file) - Run the file in the Lastline sandbox and retrieve the analysis results \
-[get report](#action-get-report) - Query for results of an already completed task in Lastline \
-[detonate url](#action-detonate-url) - Load a URL in the Lastline sandbox and retrieve the analysis results \
-[test connectivity](#action-test-connectivity) - This action connects to the server to verify the connection \
+[detonate file](#action-detonate-file) - Run the file in the Lastline sandbox and retrieve the analysis results <br>
+[get report](#action-get-report) - Query for results of an already completed task in Lastline <br>
+[detonate url](#action-detonate-url) - Load a URL in the Lastline sandbox and retrieve the analysis results <br>
+[test connectivity](#action-test-connectivity) - This action connects to the server to verify the connection <br>
 [get artifact](#action-get-artifact) - Download Lastline generated artifact and store to SOAR/Phantom Vault
 
 ## action: 'detonate file'
 
 Run the file in the Lastline sandbox and retrieve the analysis results
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action requires the input file to be present in the vault and therefore takes the vault id as the input parameter. <br/> This action supports PE, PDF, doc, etc. for analysis.
@@ -345,7 +345,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Query for results of an already completed task in Lastline
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -414,7 +414,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Load a URL in the Lastline sandbox and retrieve the analysis results
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -491,7 +491,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 This action connects to the server to verify the connection
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -506,7 +506,7 @@ No Output
 
 Download Lastline generated artifact and store to SOAR/Phantom Vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -552,7 +552,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

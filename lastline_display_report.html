@@ -11,7 +11,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!--File: lastline_display_report.html
-Copyright (c) 2015-2025 Splunk Inc.
+Copyright (c) 2015-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ a:hover {
               {% if result.summary.type == 'url' %}
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.summary.target }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.summary.target|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.summary.target }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
@@ -126,7 +126,7 @@ a:hover {
             </td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['lastline task id'], 'value': '{{ result.summary.id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['lastline task id'], 'value': '{{ result.summary.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.summary.id }}
                 &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>
@@ -153,7 +153,7 @@ a:hover {
               </td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ result.report.md5 }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ result.report.md5|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.report.md5 }}
                   &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                 </a>
@@ -188,14 +188,14 @@ a:hover {
               <tr>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_req.url }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_req.url|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ curr_req.url }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
                 </td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_req.ip }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_req.ip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ curr_req.ip }}
                     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
